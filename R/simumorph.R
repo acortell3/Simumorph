@@ -157,11 +157,41 @@ simumorph <- function(x, m.space, init, init.from.morphospace = T, target, targe
 			
 					print(index) ## To see progress
 					index <- index + 1
-				} else if (method == "AtoA" | method == "AtoB"){
+				} else if (method == "AtoA"){
 					## Compute procrustes distance 
 					pdist <- proc_dist(tar_shape,cand_shape[[2]],multi = F)
 
 					if (pdist <= e){
+						## Store values for posterior plotting and assessment
+						# Vectors to store amplitude and phase values
+						amplitudes <- cand_vals[1:(length(cand_vals)/2)]
+						phases <- cand_vals[((length(cand_vals)/2)+1):length(cand_vals)]
+						simuls[[index]] <- cand_shape[[2]]
+						Axmat[,index] <- amplitudes[(1:length(amplitudes)) %% 2 == 1] 
+						Aymat[,index] <- amplitudes[(1:length(amplitudes)) %% 2 == 0]
+						Phixmat[,index] <- phases[(1:length(phases)) %% 2 == 1]
+						Phiymat[,index] <- phases[(1:length(phases)) %% 2 == 0]
+						proc_distances[index] <- pdist
+						par_sim[[index]] <- cand_shape[[1]]
+						i_shape <- cand_vals
+			
+						print(index) ## To see progress
+						index <- index + 1
+						attempt <- 0
+					} else {
+					attempt <- attempt + 1
+					if (attempt >= max.attempts){
+						stop(paste0("Simulation failed after ", max.attempts," attempts. Consider increasing e"))
+					}
+					}
+				} else if (method == "AtoB"){
+					old_e <- e
+					## Compute procrustes distance 
+					pdist <- proc_dist(tar_shape,cand_shape[[2]],multi = F)
+
+					if (pdist <= old_e){
+						## Update procrustes distance with new
+						e <- pdist
 						## Store values for posterior plotting and assessment
 						# Vectors to store amplitude and phase values
 						amplitudes <- cand_vals[1:(length(cand_vals)/2)]
@@ -227,7 +257,7 @@ simumorph <- function(x, m.space, init, init.from.morphospace = T, target, targe
 			
 				print(index) ## To see progress
 				index <- index + 1
-			} else if (method == "AtoA" | method == "AtoB"){
+			} else if (method == "AtoA"){
 				## Compute procrustes distance 
 				pdist <- proc_dist(tar_shape,cand_shape[[2]],multi = F)
 
@@ -248,7 +278,38 @@ simumorph <- function(x, m.space, init, init.from.morphospace = T, target, targe
 					print(index) ## To see progress
 					index <- index + 1
 				}
-			} else if (method == "AtoMult"){
+			} else if (method == "AtoB"){
+					old_e <- e
+					## Compute procrustes distance 
+					pdist <- proc_dist(tar_shape,cand_shape[[2]],multi = F)
+
+					if (pdist <= old_e){
+						## Update procrustes distance with new
+						e <- pdist
+						## Store values for posterior plotting and assessment
+						# Vectors to store amplitude and phase values
+						amplitudes <- cand_vals[1:(length(cand_vals)/2)]
+						phases <- cand_vals[((length(cand_vals)/2)+1):length(cand_vals)]
+						simuls[[index]] <- cand_shape[[2]]
+						Axmat[,index] <- amplitudes[(1:length(amplitudes)) %% 2 == 1] 
+						Aymat[,index] <- amplitudes[(1:length(amplitudes)) %% 2 == 0]
+						Phixmat[,index] <- phases[(1:length(phases)) %% 2 == 1]
+						Phiymat[,index] <- phases[(1:length(phases)) %% 2 == 0]
+						proc_distances[index] <- pdist
+						par_sim[[index]] <- cand_shape[[1]]
+						i_shape <- cand_vals
+			
+						print(index) ## To see progress
+						index <- index + 1
+						attempt <- 0
+					} else {
+					attempt <- attempt + 1
+					if (attempt >= max.attempts){
+						stop(paste0("Simulation failed after ", max.attempts," attempts. Consider increasing e"))
+					}
+					}
+			}
+			else if (method == "AtoMult"){
 				## Compute procrustes distance
 				pdist <- proc_dist(cand_shape[[2]], tar_shape, multi = T)
 
@@ -268,10 +329,17 @@ simumorph <- function(x, m.space, init, init.from.morphospace = T, target, targe
 			
 					print(index) ## To see progress
 					index <- index + 1			
+					attempt <- 0
+					} else {
+						attempt <- attempt + 1
+						if (attempt >= max.attempts){
+							stop(paste0("Simulation failed after ", max.attempts," attempts. Consider increasing e"))
+						}
+					}
 				}
 			}
 		}
-	}
+
 
 	if (isTRUE(only.shapes)){
 		names(simuls) <- paste0("Shape_t_",seq(1:length(simuls)))
