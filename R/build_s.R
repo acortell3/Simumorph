@@ -12,7 +12,6 @@
 #'   If `sing.vals = FALSE`, `x` is a vector of values in the order: Ax1, Ay1, Ax2, Ay2, ..., Axn, Ayn, Phix1, Phiy1, Phix2, Phiy2, ..., Phixn, Phiyn.  
 #' @param sing.vals Logical. Indicates if `x` contains singular values as a data frame (`TRUE`) or a combined vector (`FALSE`). Default is `FALSE`.
 #' @param fou.pars Logical. If `TRUE`, the function returns a list containing the Fourier parameters and the reconstructed shape coordinates. Default is `FALSE`.
-#' @param n.harm Integer. Number of harmonics to use for reconstruction.
 #' @param npts Integer. Number of points to use in the reconstructed shape.
 #' 
 #' @import Momocs
@@ -24,7 +23,7 @@
 #' 2. `Shape`: matrix of shape coordinates (x,y).
 #' 
 #' @export
-build_s <- function(x, sing.vals = F, fou.pars = F, n.harm, npts){
+build_s <- function(x, sing.vals = F, fou.pars = F, npts){
 	
 	if (sing.vals == F){ 
 		amp_pha <- unlist(as.data.frame(x))
