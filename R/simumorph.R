@@ -44,22 +44,23 @@ simumorph <- function(x, m.space, init, init.from.morphospace = T, target, targe
 	i_shape <- m.space[init,]
 
 	## Define target(s)
-	if (length(target) == 1){
+	## For the case of the free simulation
+	if (method == "Free" | method == "AtoA"){
+		target <- init		
+		tar_vals <- m.space[init,]
+		tar_shape <- build_s(m.space[init,], sing.vals = T, fou.pars = F, npts = npts)
+	} else if (method == "AtoB"){
 		tar_vals <- m.space[target,]
 		tar_shape <- build_s(m.space[target,], sing.vals = T, fou.pars = F, npts = npts)
-	} else {
+	} else if (method == "AtoMult"){
 		tar_shape <- list()
-		
 		for (i in 1:length(target)){
 			tar_shape[[i]] <- build_s(m.space[target[i],],sing.vals = T, fou.pars = F, npts = npts)
 		}
+	} else {
+		stop("No valid method provided")
 	} 
 	
-	## For the case of the free simulation
-	if (method == "Free"){
-		tar_vals <- m.space[init,]
-		tar_shape <- build_s(m.space[target,], sing.vals = T, fou.pars = F, npts = npts)
-	}
 
 	## Remove init from morphospace, if so specified
 	if (init.from.morphospace == F){
@@ -366,28 +367,37 @@ simumorph <- function(x, m.space, init, init.from.morphospace = T, target, targe
 #######################################################
 
 ## Libraries
-#library(Momocs) ## For GMM functions
-#library(vegan) ## For manual Procrustes
-#library(tmvtnorm) ## For truncated multivariate normal
-#library(sf) ## to check internal intersections
+library(Momocs) ## For GMM functions
+library(vegan) ## For manual Procrustes
+library(tmvtnorm) ## For truncated multivariate normal
+library(sf) ## to check internal intersections
 
 ## Load necessary functions
-#lapply(c("amplitude.R","phase.R","proc_dist.R","build_s.R","morphospace.R"), source)
+lapply(c("amplitude.R","phase.R","proc_dist.R","build_s.R","morphospace.R"), source)
 
 
 ## Load necessary objects (produced with morphospace.R)
-#geo_out <- readRDS("../../Simu_geos/Utilities/geo_out.rds") ## Observed shapes
-#morpho_pars <- readRDS("../../Simu_geos/Utilities/morpho_pars.rds") ## Observed parameters
-#amp_pha_mat <- readRDS("../../Simu_geos/Utilities/amp_pha_mat.rds") ## Amplitude and phase matrix
-#amp_pha_cov <- readRDS("../../Simu_geos/Utilities/amp_pha_cov.rds") ## Covariance matrix
+geo_out <- readRDS("../../Simu_geos/Utilities/geo_out.rds") ## Observed shapes
+morpho_pars <- readRDS("../../Simu_geos/Utilities/morpho_pars.rds") ## Observed parameters
+amp_pha_mat <- readRDS("../../Simu_geos/Utilities/amp_pha_mat.rds") ## Amplitude and phase matrix
+amp_pha_cov <- readRDS("../../Simu_geos/Utilities/amp_pha_cov.rds") ## Covariance matrix
 
 
 #simumorph <- function(x, morphospace, init, init.from.morphospace = T, target, target.from.morphospace = T, method = c("AtoA","AtoB","AtoMult","Free"), sim, npts, a = 0.2, e = 0.15, dynamic_e = F, f = 100, int.allowed = F, only.shapes = F){
 
-#sims <- 16
+sims <- 100
 
-#out <- simumorph(x = amp_pha_cov, m.space = amp_pha_mat, init = 1, target = 50, method = "AtoB", sim = sims, npts = 120, only.shapes = F, e = 0.5, max.attempts = 500)
+out <- simumorph(x = amp_pha_cov, m.space = amp_pha_mat, init = 1, target = nrow(amp_pha_mat), method = "AtoA", sim = sims, npts = 120, only.shapes = T, a = 0.2, e = 0.4, max.attempts = 500, f = 100)
 
+mat <- matrix(c(seq(1,100),rep(101,20)), nrow = 12, byrow = T) 
+
+png("../Working_images/AtoA.png", res = 50, height = 1500, width = 1500)
+layout(mat)
+for (i in 1:sims){
+	plot(out[[i]], type = "l", lwd = 1.5, cex.main = 2, xlab = "", ylab = "", bty = "n", main = paste0("t = ",i))
+	polygon(out[[i]], col = "seagreen")
+}
+dev.off()
 #par(mfrow = c(4,4))
 #for (i in 1:sims){
 #	plot(out[[i]], type = "l")
