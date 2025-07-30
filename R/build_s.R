@@ -26,7 +26,10 @@
 build_s <- function(x, sing.vals = F, fou.pars = F, npts){
 	
 	if (sing.vals == F){ 
-		amp_pha <- unlist(as.data.frame(x))
+		if (nrow(x) > 1){
+			warning("You've said sing.vals == F, but nrow(x) > 1 (probably you passed an, bn, cn, dn). Are you sure that's what you want?")
+		}
+		amp_pha <- unlist(x)
 		
 		## Rebuild parameters from harmonic/phase values
 		## Build vectors for selection
@@ -44,6 +47,9 @@ build_s <- function(x, sing.vals = F, fou.pars = F, npts){
 		     		      	   "cn" = Ay*sin(Phiy),
 		     	   	      	   "dn" = Ay*cos(Phiy))
 	} else {
+		if (nrow(x) == 1){
+			warning("You've said sing.vals == T, but nrow(x) == 1 (probably you passed amplitudes and phases). Are you sure that's what you want?")
+		}
 		Ax <- x[,1]
 		Ay <- x[,2]
 		Phix <- x[,3]
