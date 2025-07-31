@@ -1,4 +1,5 @@
 
+
 ## Function 4. simumorph
 #' @title Simulate shape evolution in morphospace given a covariance matrix
 #' 
@@ -48,19 +49,18 @@ simumorph <- function(x, m.space, init, init.from.morphospace = T, target, targe
 	if (method == "Free" | method == "AtoA"){
 		target <- init		
 		tar_vals <- m.space[init,]
-		tar_shape <- build_s(m.space[init,], sing.vals = T, fou.pars = F, npts = npts)
+		tar_shape <- build_s(m.space[init,], fou.pars = F, npts = npts)
 	} else if (method == "AtoB"){
 		tar_vals <- m.space[target,]
-		tar_shape <- build_s(m.space[target,], sing.vals = T, fou.pars = F, npts = npts)
+		tar_shape <- build_s(m.space[target,], fou.pars = F, npts = npts)
 	} else if (method == "AtoMult"){
 		tar_shape <- list()
 		for (i in 1:length(target)){
-			tar_shape[[i]] <- build_s(m.space[target[i],],sing.vals = T, fou.pars = F, npts = npts)
+			tar_shape[[i]] <- build_s(m.space[target[i],], fou.pars = F, npts = npts)
 		}
 	} else {
 		stop("No valid method provided")
 	} 
-	
 
 	## Remove init from morphospace, if so specified
 	if (init.from.morphospace == F){
@@ -124,7 +124,7 @@ simumorph <- function(x, m.space, init, init.from.morphospace = T, target, targe
 		lower_thres[((ncol(m.space)/2)+1):ncol(m.space)] <- unlist(as.data.frame(i_shape[((ncol(m.space)/2)+1):ncol(m.space)])) - a
 		upper_thres[((ncol(m.space)/2)+1):ncol(m.space)] <- unlist(as.data.frame(i_shape[((ncol(m.space)/2)+1):ncol(m.space)])) + a
  	
-		## Bound to [-pi,pi
+		## Bound to [-pi,pi]
 		lower_thres[((ncol(m.space)/2)+1):ncol(m.space)] <- pmin(pmax(lower_thres[((ncol(m.space)/2)+1):ncol(m.space)],-pi),pi)
 		upper_thres[((ncol(m.space)/2)+1):ncol(m.space)] <- pmin(pmax(upper_thres[((ncol(m.space)/2)+1):ncol(m.space)],-pi),pi)
 		
@@ -139,29 +139,10 @@ simumorph <- function(x, m.space, init, init.from.morphospace = T, target, targe
 
 		if (int.allowed == F){
 			if (isTRUE(cross)){
-				if (method == "Free"){
-					## Compute procrustes distance to init for report
-					pdist <- proc_dist(tar_shape,cand_shape[[2]],multi = F)
-
-					## Store values for posterior plotting and assessment
-					# Vectors to store amplitude and phase values
-					amplitudes <- cand_vals[1:(length(cand_vals)/2)]
-					phases <- cand_vals[((length(cand_vals)/2)+1):length(cand_vals)]
-					simuls[[index]] <- cand_shape[[2]]
-					Axmat[,index] <- amplitudes[(1:length(amplitudes)) %% 2 == 1] 
-					Aymat[,index] <- amplitudes[(1:length(amplitudes)) %% 2 == 0]
-					Phixmat[,index] <- phases[(1:length(phases)) %% 2 == 1]
-					Phiymat[,index] <- phases[(1:length(phases)) %% 2 == 0]
-					proc_distances[index] <- pdist
-					par_sim[[index]] <- cand_shape[[1]]
-					i_shape <- cand_vals
-			
-					print(index) ## To see progress
-					index <- index + 1
-				} else if (method == "AtoA"){
+				if (method == "AtoA"){
 					## Compute procrustes distance 
-					pdist <- proc_dist(tar_shape,cand_shape[[2]],multi = F)
-
+					pdist <- proc_dist(cand_shape[[2]],tar_shape,multi = F) 
+					
 					if (pdist <= e){
 						## Store values for posterior plotting and assessment
 						# Vectors to store amplitude and phase values
@@ -180,19 +161,17 @@ simumorph <- function(x, m.space, init, init.from.morphospace = T, target, targe
 						index <- index + 1
 						attempt <- 0
 					} else {
-					attempt <- attempt + 1
-					if (attempt >= max.attempts){
-						stop(paste0("Simulation failed after ", max.attempts," attempts. Consider increasing e"))
-					}
+						attempt <- attempt + 1
+						if (attempt >= max.attempts){
+							stop(paste0("Simulation failed after ", max.attempts," attempts. Consider increasing e"))
+						}
 					}
 				} else if (method == "AtoB"){
 					old_e <- e
-					## Compute procrustes distance 
-					pdist <- proc_dist(tar_shape,cand_shape[[2]],multi = F)
-
+					## e procrustes distance 
+					pdist <- proc_dist(cand_shape[[2]],tar_shape,multi = F) 
+					
 					if (pdist <= old_e){
-						## Update procrustes distance with new
-						e <- pdist
 						## Store values for posterior plotting and assessment
 						# Vectors to store amplitude and phase values
 						amplitudes <- cand_vals[1:(length(cand_vals)/2)]
@@ -206,17 +185,19 @@ simumorph <- function(x, m.space, init, init.from.morphospace = T, target, targe
 						par_sim[[index]] <- cand_shape[[1]]
 						i_shape <- cand_vals
 			
+						e <- pdist ## Update distance
 						print(index) ## To see progress
 						index <- index + 1
 						attempt <- 0
 					} else {
-					attempt <- attempt + 1
-					if (attempt >= max.attempts){
-						stop(paste0("Simulation failed after ", max.attempts," attempts. Consider increasing e"))
-					}
+						attempt <- attempt + 1
+						if (attempt >= max.attempts){
+							e <- e+e*0.1
+							warning(paste0("After ", max.attempts," attempts at t = ",index," the simulation was stuck, and e was been increased by e*0.1"))
+						}
 					}
 				} else if (method == "AtoMult"){
-					## Compute procrustes distance
+					## Compute procrustes distance 
 					pdist <- proc_dist(cand_shape[[2]], tar_shape, multi = T)
 
 					if (any(pdist <= e)){
@@ -234,34 +215,41 @@ simumorph <- function(x, m.space, init, init.from.morphospace = T, target, targe
 						i_shape <- cand_vals
 			
 						print(index) ## To see progress
-						index <- index + 1			
+						index <- index + 1
+						attempt <- 0
+					} else {
+						attempt <- attempt + 1
+						if (attempt >= max.attempts){
+							stop(paste0("Simulation failed after ", max.attempts," attempts. Consider increasing e"))
+						}
 					}
+				} else if (method == "Free"){
+					## Compute procrustes distance 
+					pdist <- proc_dist(cand_shape[[2]],tar_shape,multi = F) 
+					
+					## Store values for posterior plotting and assessment
+					# Vectors to store amplitude and phase values
+					amplitudes <- cand_vals[1:(length(cand_vals)/2)]
+					phases <- cand_vals[((length(cand_vals)/2)+1):length(cand_vals)]
+					simuls[[index]] <- cand_shape[[2]]
+					Axmat[,index] <- amplitudes[(1:length(amplitudes)) %% 2 == 1] 
+					Aymat[,index] <- amplitudes[(1:length(amplitudes)) %% 2 == 0]
+					Phixmat[,index] <- phases[(1:length(phases)) %% 2 == 1]
+					Phiymat[,index] <- phases[(1:length(phases)) %% 2 == 0]
+					proc_distances[index] <- pdist
+					par_sim[[index]] <- cand_shape[[1]]
+					i_shape <- cand_vals
+		
+					print(index) ## To see progress
+					index <- index + 1
+		
 				}
 			}
 		} else if (int.allowed == T){
-			if (method == "Free"){
-				## Compute procrustes distance to init for report
-				pdist <- proc_dist(tar_shape,cand_shape[[2]],multi = F)
-
-				## Store values for posterior plotting and assessment
-				# Vectors to store amplitude and phase values
-				amplitudes <- cand_vals[1:(length(cand_vals)/2)]
-				phases <- cand_vals[((length(cand_vals)/2)+1):length(cand_vals)]
-				simuls[[index]] <- cand_shape[[2]]
-				Axmat[,index] <- amplitudes[(1:length(amplitudes)) %% 2 == 1] 
-				Aymat[,index] <- amplitudes[(1:length(amplitudes)) %% 2 == 0]
-				Phixmat[,index] <- phases[(1:length(phases)) %% 2 == 1]
-				Phiymat[,index] <- phases[(1:length(phases)) %% 2 == 0]
-				proc_distances[index] <- pdist
-				par_sim[[index]] <- cand_shape[[1]]
-				i_shape <- cand_vals
-			
-				print(index) ## To see progress
-				index <- index + 1
-			} else if (method == "AtoA"){
+			if (method == "AtoA"){
 				## Compute procrustes distance 
-				pdist <- proc_dist(tar_shape,cand_shape[[2]],multi = F)
-
+				pdist <- proc_dist(cand_shape[[2]],tar_shape,multi = F) 
+					
 				if (pdist <= e){
 					## Store values for posterior plotting and assessment
 					# Vectors to store amplitude and phase values
@@ -278,42 +266,46 @@ simumorph <- function(x, m.space, init, init.from.morphospace = T, target, targe
 			
 					print(index) ## To see progress
 					index <- index + 1
-				}
-			} else if (method == "AtoB"){
-					old_e <- e
-					## Compute procrustes distance 
-					pdist <- proc_dist(tar_shape,cand_shape[[2]],multi = F)
-
-					if (pdist <= old_e){
-						## Update procrustes distance with new
-						e <- pdist
-						## Store values for posterior plotting and assessment
-						# Vectors to store amplitude and phase values
-						amplitudes <- cand_vals[1:(length(cand_vals)/2)]
-						phases <- cand_vals[((length(cand_vals)/2)+1):length(cand_vals)]
-						simuls[[index]] <- cand_shape[[2]]
-						Axmat[,index] <- amplitudes[(1:length(amplitudes)) %% 2 == 1] 
-						Aymat[,index] <- amplitudes[(1:length(amplitudes)) %% 2 == 0]
-						Phixmat[,index] <- phases[(1:length(phases)) %% 2 == 1]
-						Phiymat[,index] <- phases[(1:length(phases)) %% 2 == 0]
-						proc_distances[index] <- pdist
-						par_sim[[index]] <- cand_shape[[1]]
-						i_shape <- cand_vals
-			
-						print(index) ## To see progress
-						index <- index + 1
-						attempt <- 0
-					} else {
+					attempt <- 0
+				} else {
 					attempt <- attempt + 1
 					if (attempt >= max.attempts){
 						stop(paste0("Simulation failed after ", max.attempts," attempts. Consider increasing e"))
 					}
+				}
+			} else if (method == "AtoB"){
+				old_e <- e
+				## e procrustes distance 
+				pdist <- proc_dist(cand_shape[[2]],tar_shape,multi = F) 
+				
+				if (pdist <= old_e){
+					## Store values for posterior plotting and assessment
+					# Vectors to store amplitude and phase values
+					amplitudes <- cand_vals[1:(length(cand_vals)/2)]
+					phases <- cand_vals[((length(cand_vals)/2)+1):length(cand_vals)]
+					simuls[[index]] <- cand_shape[[2]]
+					Axmat[,index] <- amplitudes[(1:length(amplitudes)) %% 2 == 1] 
+					Aymat[,index] <- amplitudes[(1:length(amplitudes)) %% 2 == 0]
+					Phixmat[,index] <- phases[(1:length(phases)) %% 2 == 1]
+					Phiymat[,index] <- phases[(1:length(phases)) %% 2 == 0]
+					proc_distances[index] <- pdist
+					par_sim[[index]] <- cand_shape[[1]]
+					i_shape <- cand_vals
+		
+					e <- pdist ## Update distance
+					print(index) ## To see progress
+					index <- index + 1
+					attempt <- 0
+				} else {
+					attempt <- attempt + 1
+					if (attempt >= max.attempts){
+						e <- e+e*0.1
+						warning(paste0("After ", max.attempts," attempts at t = ",index," the simulation was stuck, and e was been increased by e*0.1"))
 					}
-			}
-			else if (method == "AtoMult"){
-				## Compute procrustes distance
+				}
+			} else if (method == "AtoMult"){
+				## Compute procrustes distance 
 				pdist <- proc_dist(cand_shape[[2]], tar_shape, multi = T)
-
 				if (any(pdist <= e)){
 					## Store values for posterior plotting and assessment
 					# Vectors to store amplitude and phase values
@@ -327,21 +319,39 @@ simumorph <- function(x, m.space, init, init.from.morphospace = T, target, targe
 					proc_distances_mult[,index] <- pdist
 					par_sim[[index]] <- cand_shape[[1]]
 					i_shape <- cand_vals
-			
+		
 					print(index) ## To see progress
-					index <- index + 1			
+					index <- index + 1
 					attempt <- 0
-					} else {
-						attempt <- attempt + 1
-						if (attempt >= max.attempts){
-							stop(paste0("Simulation failed after ", max.attempts," attempts. Consider increasing e"))
-						}
+				} else {
+					attempt <- attempt + 1
+					if (attempt >= max.attempts){
+						stop(paste0("Simulation failed after ", max.attempts," attempts. Consider increasing e"))
 					}
 				}
+			} else if (method == "Free"){
+				## Compute procrustes distance 
+				pdist <- proc_dist(cand_shape[[2]],tar_shape,multi = F) 
+				
+				## Store values for posterior plotting and assessment
+				# Vectors to store amplitude and phase values
+				amplitudes <- cand_vals[1:(length(cand_vals)/2)]
+				phases <- cand_vals[((length(cand_vals)/2)+1):length(cand_vals)]
+				simuls[[index]] <- cand_shape[[2]]
+				Axmat[,index] <- amplitudes[(1:length(amplitudes)) %% 2 == 1] 
+				Aymat[,index] <- amplitudes[(1:length(amplitudes)) %% 2 == 0]
+				Phixmat[,index] <- phases[(1:length(phases)) %% 2 == 1]
+				Phiymat[,index] <- phases[(1:length(phases)) %% 2 == 0]
+				proc_distances[index] <- pdist
+				par_sim[[index]] <- cand_shape[[1]]
+				i_shape <- cand_vals
+	
+				print(index) ## To see progress
+				index <- index + 1
+	
 			}
 		}
-
-
+	}
 	if (isTRUE(only.shapes)){
 		names(simuls) <- paste0("Shape_t_",seq(1:length(simuls)))
 		return(simuls)
@@ -361,53 +371,90 @@ simumorph <- function(x, m.space, init, init.from.morphospace = T, target, targe
 }
 
 ####### Check that it works
+
 ######################################################
 #### Load libraries and utilities
 #######################################################
 
 ## Libraries
-#library(Momocs) ## For GMM functions
-#library(vegan) ## For manual Procrustes
-#library(tmvtnorm) ## For truncated multivariate normal
-#library(sf) ## to check internal intersections
-
-## Load necessary functions
-#lapply(c("amplitude.R","phase.R","proc_dist.R","build_s.R","morphospace.R"), source)
-
-
-## Load necessary objects (produced with morphospace.R)
-#geo_out <- readRDS("../../Simu_geos/Utilities/geo_out.rds") ## Observed shapes
-#morpho_pars <- readRDS("../../Simu_geos/Utilities/morpho_pars.rds") ## Observed parameters
-#amp_pha_mat <- readRDS("../../Simu_geos/Utilities/amp_pha_mat.rds") ## Amplitude and phase matrix
-#amp_pha_cov <- readRDS("../../Simu_geos/Utilities/amp_pha_cov.rds") ## Covariance matrix
-
-
-#simumorph <- function(x, morphospace, init, init.from.morphospace = T, target, target.from.morphospace = T, method = c("AtoA","AtoB","AtoMult","Free"), sim, npts, a = 0.2, e = 0.15, dynamic_e = F, f = 100, int.allowed = F, only.shapes = F){
-
-#sims <- 100
-
-#out <- simumorph(x = amp_pha_cov, m.space = amp_pha_mat, init = 1, target = nrow(amp_pha_mat), method = "AtoA", sim = sims, npts = 120, only.shapes = T, a = 0.2, e = 0.4, max.attempts = 500, f = 100)
-
-#mat <- matrix(c(seq(1,100),rep(101,20)), nrow = 12, byrow = T) 
-
-#png("../Working_images/AtoA.png", res = 50, height = 1500, width = 1500)
-#layout(mat)
-#for (i in 1:sims){
-#	plot(out[[i]], type = "l", lwd = 1.5, cex.main = 2, xlab = "", ylab = "", bty = "n", main = paste0("t = ",i))
-#	polygon(out[[i]], col = "seagreen")
-#}
-#dev.off()
-#par(mfrow = c(4,4))
-#for (i in 1:sims){
-#	plot(out[[i]], type = "l")
-#}
-
-## Try dynamic e
-#out_de <- simumorph(x = amp_pha_cov, m.space = amp_pha_mat, init = 1, target = 1, method = "AtoB", sim = sims, npts = 120, only.shapes = T, e = 1, dynamic_e = data.frame("time" = c(3,6,10),
-#									   "e" = c(1,0.5,0.4)))
-
-#par(mfrow = c(4,4))
-#for (i in 1:sims){
-#	plot(out_de[[i]], type = "l")
-#}
-
+# library(Momocs) ## For GMM functions
+# library(vegan) ## For manual Procrustes
+# library(tmvtnorm) ## For truncated multivariate normal
+# library(sf) ## to check internal intersections
+# 
+# ## Load necessary functions
+# lapply(c("amplitude.R","phase.R","proc_dist.R","build_s.R","morphospace.R"), source)
+# 
+# 
+# ## Load necessary objects (produced with morphospace.R)
+# geo_out <- readRDS("../../Simu_geos/Utilities/geo_out.rds") ## Observed shapes
+# morpho_pars <- readRDS("../../Simu_geos/Utilities/morpho_pars.rds") ## Observed parameters
+# amp_pha_mat <- readRDS("../../Simu_geos/Utilities/amp_pha_mat.rds") ## Amplitude and phase matrix
+# amp_pha_cov <- readRDS("../../Simu_geos/Utilities/amp_pha_cov.rds") ## Covariance matrix
+# 
+# 
+# ## Examples
+# set.seed(1)
+# sims <- 100
+# 
+# out <- simumorph(x = amp_pha_cov, m.space = amp_pha_mat, init = 1, target = nrow(amp_pha_mat), method = "AtoA", sim = sims, npts = 120, only.shapes = T, a = 0.2, e = 0.05, max.attempts = 500, f = 100)
+# 
+# mat <- matrix(c(seq(1,100),rep(101,20)), nrow = 12, byrow = T) 
+# 
+# png("../Working_images/AtoA.png", res = 50, height = 1500, width = 1500)
+# layout(mat)
+# for (i in 1:sims){
+# 	plot(out[[i]], type = "l", lwd = 1.5, cex.main = 2, xlab = "", ylab = "", bty = "n", main = paste0("t = ",i))
+# 	polygon(out[[i]], col = "seagreen")
+# }
+# dev.off()
+# 
+# out <- simumorph(x = amp_pha_cov, m.space = amp_pha_mat, init = 1, target = nrow(amp_pha_mat), method = "AtoB", sim = sims, npts = 120, only.shapes = T, a = 0.5, e = 0.5, max.attempts = 500, f = 100)
+# 
+# mat <- matrix(c(seq(1,100),rep(101,20)), nrow = 12, byrow = T) 
+# 
+# png("../Working_images/AtoB.png", res = 50, height = 1500, width = 1500)
+# layout(mat)
+# for (i in 1:sims){
+# 	plot(out[[i]], type = "l", lwd = 1.5, cex.main = 2, xlab = "", ylab = "", bty = "n", main = paste0("t = ",i))
+# 	polygon(out[[i]], col = "seagreen")
+# }
+# dev.off()
+# 
+# out <- simumorph(x = amp_pha_cov, m.space = amp_pha_mat, init = 1, target = c(1,10,50,80), method = "AtoMult", sim = sims, npts = 120, only.shapes = T, a = 1, e = 0.1, max.attempts = 500, f = 100)
+# 
+# mat <- matrix(c(seq(1,100),rep(101,20)), nrow = 12, byrow = T) 
+# 
+# png("../Working_images/AtoMult.png", res = 50, height = 1500, width = 1500)
+# layout(mat)
+# for (i in 1:sims){
+# 	plot(out[[i]], type = "l", lwd = 1.5, cex.main = 2, xlab = "", ylab = "", bty = "n", main = paste0("t = ",i))
+# 	polygon(out[[i]], col = "seagreen")
+# }
+# dev.off()
+# 
+# out <- simumorph(x = amp_pha_cov, m.space = amp_pha_mat, init = 1, target = nrow(amp_pha_mat), method = "Free", sim = sims, npts = 120, only.shapes = T, a = 0.2, e = 0.05, max.attempts = 500, f = 100)
+# 
+# mat <- matrix(c(seq(1,100),rep(101,20)), nrow = 12, byrow = T) 
+# 
+# png("../Working_images/Free.png", res = 50, height = 1500, width = 1500)
+# layout(mat)
+# for (i in 1:sims){
+# 	plot(out[[i]], type = "l", lwd = 1.5, cex.main = 2, xlab = "", ylab = "", bty = "n", main = paste0("t = ",i))
+# 	polygon(out[[i]], col = "seagreen")
+# }
+# dev.off()
+# 
+# ## Try dynamic e
+# out_de <- simumorph(x = amp_pha_cov, m.space = amp_pha_mat, init = 1, method = "AtoA", sim = sims, npts = 120, only.shapes = T, e = 1, dynamic_e = data.frame("time" = c(3,6,10),
+# 																			      "e" = c(1,0.5,0.4)))
+# 
+# png("../Working_images/dynamic_e.png", res = 50, height = 1500, width = 1500)
+# layout(mat)
+# for (i in 1:sims){
+# 	plot(out_de[[i]], type = "l", lwd = 1.5, cex.main = 2, xlab = "", ylab = "", bty = "n", main = paste0("t = ",i))
+# 	polygon(out_de[[i]], col = "seagreen")
+# }
+# dev.off()
+# 
+# 

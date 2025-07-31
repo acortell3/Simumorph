@@ -4,7 +4,7 @@
 \alias{build_s}
 \title{Rebuild shape from amplitude and phase values}
 \usage{
-build_s(x, sing.vals = F, fou.pars = F, n.harm, npts)
+build_s(x, sing.vals = F, fou.pars = F, npts)
 }
 \arguments{
 \item{x}{Either a data frame or vector containing amplitude and phase values.
@@ -15,8 +15,6 @@ If \code{sing.vals = FALSE}, \code{x} is a vector of values in the order: Ax1, A
 \item{sing.vals}{Logical. Indicates if \code{x} contains singular values as a data frame (\code{TRUE}) or a combined vector (\code{FALSE}). Default is \code{FALSE}.}
 
 \item{fou.pars}{Logical. If \code{TRUE}, the function returns a list containing the Fourier parameters and the reconstructed shape coordinates. Default is \code{FALSE}.}
-
-\item{n.harm}{Integer. Number of harmonics to use for reconstruction.}
 
 \item{npts}{Integer. Number of points to use in the reconstructed shape.}
 }
