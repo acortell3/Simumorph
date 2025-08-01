@@ -193,7 +193,7 @@ simumorph <- function(x, m.space, init, init.from.morphospace = T, target, targe
 						attempt <- attempt + 1
 						if (attempt >= max.attempts){
 							e <- e+e*0.1
-							warning(paste0("After ", max.attempts," attempts at t = ",index," the simulation was stuck, and e was been increased by e*0.1"))
+							warning(paste0("After ", max.attempts," attempts at t = ",index," the simulation was stuck, and e was increased by e*0.1"))
 						}
 					}
 				} else if (method == "AtoMult"){
@@ -300,7 +300,7 @@ simumorph <- function(x, m.space, init, init.from.morphospace = T, target, targe
 					attempt <- attempt + 1
 					if (attempt >= max.attempts){
 						e <- e+e*0.1
-						warning(paste0("After ", max.attempts," attempts at t = ",index," the simulation was stuck, and e was been increased by e*0.1"))
+						warning(paste0("After ", max.attempts," attempts at t = ",index," the simulation was stuck, and e was increased by e*0.1"))
 					}
 				}
 			} else if (method == "AtoMult"){
