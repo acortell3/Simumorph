@@ -47,7 +47,7 @@ build_s <- function(x, sing.vals = F, fou.pars = F, npts){
 		     		      	   "cn" = Ay*sin(Phiy),
 		     	   	      	   "dn" = Ay*cos(Phiy))
 	} else {
-		if (nrow(x) == 1){
+		if (nrow(x) == 1 | isTRUE(is.vector(val_vec))){
 			warning("You've said sing.vals == T, but nrow(x) == 1 (probably you passed amplitudes and phases). Are you sure that's what you want?")
 		}
 		Ax <- x[,1]
