@@ -26,10 +26,12 @@
 build_s <- function(x, sing.vals = F, fou.pars = F, npts){
 	
 	if (sing.vals == F){ 
-		if (nrow(x) > 1){
-			warning("You've said sing.vals == F, but nrow(x) > 1 (probably you passed an, bn, cn, dn). Are you sure that's what you want?")
+		if (isTRUE(is.data.frame(x))){
+			if (nrow(x) > 1){
+				warning("You've said sing.vals == F, but nrow(x) > 1 (probably you passed an, bn, cn, dn). Are you sure that's what you want?")
+			}
+			amp_pha <- unlist(x)
 		}
-		amp_pha <- unlist(x)
 		
 		## Rebuild parameters from harmonic/phase values
 		## Build vectors for selection
@@ -47,7 +49,7 @@ build_s <- function(x, sing.vals = F, fou.pars = F, npts){
 		     		      	   "cn" = Ay*sin(Phiy),
 		     	   	      	   "dn" = Ay*cos(Phiy))
 	} else {
-		if (nrow(x) == 1 | isTRUE(is.vector(val_vec))){
+		if (nrow(x) == 1 | isTRUE(is.data.frame(x))){
 			warning("You've said sing.vals == T, but nrow(x) == 1 (probably you passed amplitudes and phases). Are you sure that's what you want?")
 		}
 		Ax <- x[,1]
@@ -89,12 +91,12 @@ build_s <- function(x, sing.vals = F, fou.pars = F, npts){
 
 ############################################################
 ## Check that it works
-#library(Momocs)
+library(Momocs)
 
-#amp_pha_mat <- readRDS("../../Simu_geos/Utilities/amp_pha_mat.rds") ## Amplitude and phase matrix
-#shape <- amp_pha_mat[1,]
+amp_pha_mat <- readRDS("../../Simu_geos/Utilities/amp_pha_mat.rds") ## Amplitude and phase matrix
+shape <- amp_pha_mat[1,]
 
-#shape <- build_s(shape, sing.vals = F, fou.pars = T, npts = 150) 
+shape <- build_s(shape, sing.vals = F, fou.pars = T, npts = 150) 
 #plot(shape[[2]])
 
 #shape[[1]]
