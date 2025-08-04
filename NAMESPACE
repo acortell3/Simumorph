@@ -2,6 +2,7 @@
 
 export(amplitude)
 export(build_s)
+export(interpol_s)
 export(morphospace)
 export(phase)
 export(proc_dist)
