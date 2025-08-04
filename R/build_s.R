@@ -82,7 +82,7 @@ build_s <- function(x, sing.vals = F, fou.pars = F, npts){
 	amp_pha_shape <- efourier_i(mat_par_vals_l, nb.h = nrow(mat_par_vals), nb.pts = npts)
 	amp_pha_shape <- coo_sample(amp_pha_shape, n = npts)
 
-	if (fou.pars == T){
+	if (isTRUE(fou.pars)){
 		## Names for pars
 		par_names <- rep(NA,nrow(mat_par_vals))
 		for (i in 1:nrow(mat_par_vals)){
@@ -90,11 +90,12 @@ build_s <- function(x, sing.vals = F, fou.pars = F, npts){
 		}
 		rownames(mat_par_vals) <- par_names
 		res <- list("Fourier_parameters" = mat_par_vals,
-			    "Shape" = amp_pha_shape)
+			    "Shape" = amp_pha_shape)		
 		return(res)
 	} else {
 		return(amp_pha_shape)
 	}
+
 } 
 
 ############################################################
@@ -104,9 +105,9 @@ build_s <- function(x, sing.vals = F, fou.pars = F, npts){
 #amp_pha_mat <- readRDS("../../Simu_geos/Utilities/amp_pha_mat.rds") ## Amplitude and phase matrix
 #shape <- amp_pha_mat[1,]
 #shape <- unlist(shape)
-#shape <- build_s(shape, sing.vals = F, fou.pars = T, npts = 150) 
+#shape <- build_s(shape, sing.vals = F, fou.pars = F, npts = 150) 
 #plot(shape[[2]])
-
+#plot(shape)
 #shape[[1]]
 
 #str(shape)
