@@ -1,5 +1,7 @@
-
-
+%%
+%\VignetteIndexEntry{simumorph_vignette_1}
+%\VignetteEngine{quarto::html}
+%\VignetteEncoding{UTF-8}
 ---
 title: |
   Fundamentals and workflow for the R package Simumorph
@@ -285,7 +287,7 @@ types <- c("G1.1", "G1.2", "G2", "G3.1", "G3.2", "G4.1",
 
 ## Extract outlines
 dir <- getwd()
-setwd("Parametric_space_outlines") ## Set your own path where the jpgs are
+setwd("../inst/extdata/Parametric_space_outlines") ## Set your own path where the jpgs are
 ## Parametric_space_outlines is a folder with the oulines.jpgs of the shapes, and it is provided as data within the Simumorph package. It can also be found, individually, at github/acortell3/Simumorph. If the user has downloaded with the package. It can know the path where the files are by running system.file("extdata/Parametric_space_outlines", package = Simumorph"). Then the folder can be moved somewhere else, or the path can be directly substituted here.
 set.seed(1)
 geo_list <- c(1:28)
@@ -766,6 +768,41 @@ mrsp_cov <- mrsp[[3]]
 ```
 
 With the code above we have built an extended morphospace (`expand = T`) from the provided shapes (`x = geo_out`) through pairwise linear interpolation (`mode = "mean"`, currently the only implemented method) with seven harmonics (`n.harm = 7`) per shape and type names extracted from the vector `types`. The resulting object is a list with three elements, where the first element is a list with the original Fourier coefficients, the second element a data frame with $A$ and $\phi$ values for each object within the extended morphometric space and the third is the resulting covariance matrix. If `cov.mat = F` the list has only two elements and the covariance matrix is not produced. 
+
+If necessary, we can also interpolate single shapes
+```{r}
+#| fold: true
+#| message: false
+
+## We interpolate a sequence of three intermediate shapes. Single shapes can also be interpolated. Read into the documentaion
+
+## First, we extract the Fourier parameters for the interpolation
+geo_out_li <- Momocs::slice(geo_out, c(26,27)) ## Select wto shapes
+
+## Extract their Fourier parameters
+morpho_pars_li <- list()
+morpho_pars_li <- Momocs::efourier(Momocs::coo_center(Momocs::coo_scale(Momocs::coo_alignxax(geo_out_li))),nb.h = 7, norm = F, start = T)
+
+## We can pass them to the function either as data frames, or lists
+s1 <- data.frame("an" =  morpho_pars_li[1][1:7],
+		 "bn" =  morpho_pars_li[1][8:14],
+		 "cn" =  morpho_pars_li[1][15:21],
+		 "dn" =  morpho_pars_li[1][22:28])
+s2 <- list("an" =  morpho_pars_li[2][1:7],
+	   "bn" =  morpho_pars_li[2][8:14],
+	   "cn" =  morpho_pars_li[2][15:21],
+	   "dn" =  morpho_pars_li[2][22:28])
+
+## We interpolate three middle shapes
+int_shape <- interpol_s(shape1 = s1, shape2 = s2, method = "sequence", npts = 120, fou.pars = T, n.shapes = 3)
+
+## We can plot the interpolated shapes
+par(mfrow = c(1,3))
+for (i in 1:3){
+	plot(int_shape[[i]]$Shape, type = "l", asp = 1)
+	polygon(int_shape[[i]]$Shape, col = "gold4", asp = 1)
+}
+```
 
 Currently, the main simulation can support four basic methods, as follows:
 
