@@ -1,0 +1,825 @@
+
+
+---
+title: |
+  Fundamentals and workflow for the R package Simumorph
+  <br>
+  <span style="font-size:0.4em; font-weight:normal; font-style:italic;">
+    Alfredo Cortell-Nicolau<sup>1</sup> & Anne Kandler<sup>1</sup>
+    <div style ="margin-top: 2px;">
+    <small><sup>1</sup> Department of Human Behavior, Ecology and Culture, Max Planck Institute for Evolutionary Anthropology, Leipzig, Germany</small>
+  </span>
+format:
+  html:
+    toc: true
+    toc-location: body
+    code-fold: true
+    crossref: true
+    self-contained: true
+    toc-depth: 3
+bibliography: references.bib
+csl: apa.csl
+editor: visual
+---
+# Introduction {#sec-int}
+
+The following document goes through the theoretical fundamentals on how to develop a discrete morphometric simulation of cultural artefacts (for the example, geometric microliths), and offers a reproducible workflow using the `Rpackage Simumorph`. This vignette will cover everything in detail, but very briefly here, the idea is to reproduce the variation from a shape A to a shape B across a $t$ number of discrete steps. To ensure the consistency among the shapes, we use a morphospace (a set of shapes provided by the user, ideally from observed data), from which we extract a covariance matrix that is used for multivariate sampling of new shapes. Using this covariance matrix to propose new shapes ensures that the structural relationships of the parameters of such shapes are consistent with the ones within the 'observed' data.
+
+There are several elements that have to be considered to deploy the full simulation, and they are significantly interrelated. We have decided to explain each of these elements one by one, with several references to one another throughout the text, although the reader will probably have to bear with us while we go through each element until getting the full picture at the end. For the reader to understand what to expect on section, a brief outline would be as follows:
+
+1. *General theoretical approach*. Here we offer a brief theoretical overview of how outline-based Geometric Morphometrics (GMM) works. We also explain in some detail what a harmonic is and how its mathematical properties define it, since we will need those properties for the simulation.
+2. *Toolbox*. Only using a covariance matrix might not be enough to ensure a consistent simulation, while staying within morphometrically plausible shapes. In this section we go through the different elements that we have used to deploy a realistic simulation.
+3. *Model and simulation*. In this section we show our model. The model is based on sampling from a truncated normal multivariate distribution, where all the different caveats and restrictions have been explained in the section above.
+4. *Simumorph*. It provides code and examples on how to perform all the above (e.g. the full simulation workflow) using `Simumorph`.
+
+From the four sections above, the first three offer the theory and the individual code necessary to run the processes, whilst the fourth section offers the compiled workflow using `Simumorph`. The reader can decide how to use this vignette, either just the theory, individual code, theory and package together or just dive directly into the package going to section 4. The code during sections 1, 2 and 3 build on each other, while the code in section 4 can be run independently.
+
+# General theoretical approach {#sec-theo}
+Geometric Morphometrics (GMM) is an approach developed in the field of Ecology, whose main objective is to measure and compare natural shapes [@bookstein_foundations_1982; @rohlf_comparison_1984; @claude_morphometrics_2008]. Here we focus on the technical details of how we use it in order to develop a diachronic simulation, or drift, of the morphometry of cultural artifacts, in our case, prehistoric arrowheads, or geometric microliths.
+
+Our objective is to obtain shapes that undergo small but consistent variation for each step $t$ of the simulation. These shapes must meet the following conditions:
+
+1. They must be functionally realistic (e.g. cannot contain line inter-crossings or wiggles)
+2. Shape at $t$ depends on shape at $t-1$ 
+3. Shape at $t$ must vary only slightly from shape at $t-1$  
+
+## GMM (outline-based) fundamentals {#sec-GMMout}
+To do this, we use outline-based geometric morphometrics, relying on Elliptic Fourier Decomposition [@claude_morphometrics_2008; @kuhl_elliptic_1982]. Essentially, the general expression of the Fourier expansion for a periodic function $f(t)$ with $t \in \mathbb{R}$, of period $T$ and with $n$ number of harmonics, is defined as
+
+$$f(t) = \frac{1}{2}a_0 + \sum_{n=1}^{\infty}[a_n \cos(\omega_n t)+b_n \sin(\omega_n t)],$${#eq-fou}
+
+where
+
+$$\omega_n = n\frac{2\pi}{T}$${#eq-fre}
+
+is the angular frequency of the $n^{th}$ harmonic of the function (in radians), and where
+
+$$a_n = \frac{2}{T}\int_{t_1}^{t_2}f(t)\cos(\omega_n t) dt$${#eq-an}
+
+are the even Fourier coefficients, and 
+
+$$b_n = \frac{2}{T}\int_{t_1}^{t_2}f(t)\sin(\omega_n t) dt$${#eq-bn}
+
+are the odd Fourier coefficients.
+
+These Fourier transforms, however, cannot be applied directly on outline analysis, since they are defined as a function of x and y-coordinates in two dimensions. Thus, the most common adopted solution is to use elliptic Fourier decomposition, by which the x and y coordinates are decomposed and expressed as functions of the curvilinear abscissa. Under this approach, we can apply the Fourier equation for each coordinate, as follows:
+
+$$x(t) = \frac{a_0}{2}+\sum_{n=1}^{+\infty}a_n \cos n \omega t + b_n \sin n \omega t$${#eq-x}
+
+and
+
+$$y(t) = \frac{c_0}{2}+\sum_{n=1}^{+\infty}c_n \cos n \omega t + d_n \sin n \omega t.$${#eq-y}
+
+Here, and considering an outline with $k$ finite number of points, we can calculate discrete estimators for the different parameters as:
+
+$$a_n = \frac{T}{2\pi^2n^2}\sum_{p=1}^{k}\frac{\Delta x_p}{\Delta t_p}\left(\cos\frac{2\pi n t_p}{T}-\cos\frac{2\pi nt_{p-1}}{T}\right)$${#eq-dia}
+
+with 
+
+$$\Delta x_1 = x_1-x_k$$
+
+and
+
+$$b_n = \frac{T}{2\pi^2n^2}\sum_{p=1}^{k}\frac{\Delta x_p}{\Delta t_p}\left(\sin\frac{2\pi n t_p}{T}-\sin\frac{2\pi nt_{p-1}}{T}\right)$${#eq-dib}
+
+with $c_n$ and $d_n$ calculated similarly for the $y$ coordinates. Because $a_0$ and $c_0$ are used for centering, these will not be explicitly modelled and, thus, our base equation becomes
+
+$$x(t) = \sum_{n=1}^{+\infty}a_n \cos n \omega t + b_n \sin n \omega t$${#eq-ba}
+
+and similarly for $y(t)$.
+
+Conceptually, it might be difficult to understand how periodic functions (e.g. sine waves) can produce sharp conrners, or angular features. The short answer to this is that they do not, but because the resolution of the representation increases as we add harmonics, with enough number of harmonics we can always obtain (or having the illusion to obtain) a specific angle, as pointed as it might be. If we were able to increase the size of our visualisation *ad infinitum* at some point we would see a rounded curve, but this would be of no visual nor analytical consequence if $n$ is high enough. 
+
+### Harmonics
+Fourier series were developed originally to work with so-called harmonics and harmonic ranges, and have known a significant development on different fields such as music, signal processing, electrical engineering and, of course, ecology and cultural studies. Understanding how harmonics work is crucial to understand how these are adapted in the context of outline-based geometric morphometrics. A harmonic can be defined as a sinusoidal wave with frequency multiple of a so-called fundamental frequency of a periodic signal (the 1st harmmonic). This implies that the way in which we structure the harmonics, as per @eq-fou, and of course @eq-x and @eq-y, is hierarchical. In other words, lower order harmonics have wider sinusoidal shapes, and model coarser morphometric features, whereas higher order harmonics have less impact on the general shape, but are the ones modelling finer grain details. As we will see, this has implications in how we develop a simulation, since these hierarchies must be respected through their parameter ranges if we want to obtain *credible* shapes consistently. 
+
+Each harmonic is governed by three mathematical properties: frequency ($f$), amplitude ($A$) and phase ($\phi$), which together define a sine wave according to:
+
+$$S(t) = A \cos(\omega_t - \phi),$${#eq-sine}
+
+where $\omega = 2\pi f$ is the angular frequency, in radians, derived from the frequency $f$.
+
+Now, we can individually explore each of these properties, and how they relate to the Fourier parameters ($a_n$, $b_n$, $c_n$ and $d_n$), as follows:
+
+#### (Angular) frequency
+Frequency, as we have seen above, represents the number of cycles per second and is the reciprocal of the period $T$:
+
+$$f = \frac{1}{T}.$$
+
+From here, given the angular frequency $\omega = 2\pi f$, we can easily derive the value of angular frequency per $n_{th}$ hamonic ($\omega_n$) given in @eq-fre. We can understand frequency as a parameter that governs the resolution of the sinewave, and because it is determined by $n$, it stays the same for any shape given equal $n$ and $T$. Thus, frequency will not be modelled, since it is deterministically defined by the number of harmonics, and its role within this framework is only to specify the resolution of each harmonic. An example of how frequency works can be seen below.
+
+```{r}
+#| fold: true
+#| message: false
+# Define parameters
+for (i in 1:3){
+t <- seq(0, 2*pi, length.out = 1000)  # time or angle vector
+A <- 1      # amplitude
+f <- i      # frequency (Hz)
+phi <- 0    # phase shift (radians)
+
+# Generate the sinusoidal wave
+y <- A * sin(2 * pi * f * t + phi)
+
+# Plot the wave
+plot(t, y, type = "l", col = "darkred", lwd = 2,
+     xlab = "t", ylab = "Amplitude",
+     main = paste0("harmonic ", i))
+}
+```
+
+For the definition of the harmonics, the Fourier series use the four parameters $a_n$, $b_n$, $c_n$ and $d_n$. These parameters can be linked to amplitude ($A$) and phase ($\phi$).
+
+#### Amplitude {#sec-amp}
+We can understand amplitude as the width, or range of our sinewave. In other words the difference between the maximum and minimum points on the y axis in our sinewave. Although it is not parameterised in @eq-x, it can be derived from the parameters $a_n$ and $b_n$ ($c_n$ and $d_n$ for @eq-y) as follows:
+
+From @eq-x we know that each harmonic is defined by:
+
+
+$$a_n\cos(n\omega t) + b_n\sin(n\omega t).$$
+
+
+We start with the trigonometric identity
+
+
+$$\cos(\alpha - \beta) = \cos \alpha \cos \beta + \sin \alpha \sin \beta,$$
+
+which, if applied with @eq-sine, gives 
+
+$$A_n\cos(n\omega t - \phi_n) = A_n \cos (n\omega t)  \cos (\phi_n) + A_n \sin (n\omega t) \sin (\phi_n).$$
+
+
+We can then extract the matching terms from
+
+$$a_n \cos(n\omega t) + b_n \sin (n\omega t) = A_n \cos (n\omega t)  \cos (\phi_n) + A_n \sin (n\omega t) \sin (\phi_n)$$
+
+to get
+
+$$a_n = A_n\cos(\phi_n) \ \textrm{and} \  b_n = A_n\sin(\phi_n).$$
+
+If we now want to compute $A_n$ for the parameters $a_n$ and $b_n$, we can square both equations
+
+$$a_n^2 = A_n^2\cos^2(\phi_n)$$
+$$b_n^2 = A_n^2\sin^2(\phi_n)$$
+
+and add them
+$$a_n^2+b_n^2=A_n^2\cos^2(\phi_n) + A_n^2\sin^2(\phi_n),$$
+
+or
+
+$$a_n^2+b_n^2 = A_n^2(\cos^2(\phi_n) + \sin^2(\phi_n)).$$
+
+If we then use the Pythagorean identity
+
+$$\cos^2(\phi_n) + \sin^2(\phi_n) = 1,$$
+
+it reduces to
+
+$$a_n^2+b_n^2 = A_n^2,$$
+
+which finally gives us the amplitude as
+
+$$A_n = \sqrt{a_n^2+b_n^2}.$${#eq-amp}
+
+Below we show changes in amplitude, given that the rest of parameters remain equal.
+
+```{r}
+#| fold: true
+#| message: false
+# Define parameters
+for (i in 1:3){
+t <- seq(0, 2*pi, length.out = 1000)  # time or angle vector
+A <- i      # amplitude
+f <- 1      # frequency (Hz)
+phi <- 0    # phase shift (radians)
+
+# Generate the sinusoidal wave
+y <- A * sin(2 * pi * f * t + phi)
+
+# Plot the wave
+plot(t, y, type = "l", col = "darkred", lwd = 2,
+     xlab = "t", ylab = "Amplitude",
+     main = paste0("Amplitude =  ", i))
+}
+```
+#### Phase {#sec-pha}
+In plain words, $\phi$ tells us where 'the wave starts'. As with $A$, it is not explicitly parameterised in @eq-x but, as with $A$, it can be derived from it. If, from the derivation above, we consider
+
+$$\frac{b_n}{a_n}=\frac{A_n\sin(\phi_n)}{A_n\cos(\phi_n)},$$
+
+then, since $A_n$ cancels out, and with basic trigonometry
+
+$$\frac{b_n}{a_n}=\tan(\phi_n).$$
+
+Finally, solving for $\phi_n$, we get
+
+$$\phi_n = \tan^-1\left(\frac{b_n}{a_n}\right),$$
+
+or
+
+$$\phi_n = \arctan \left(\frac{b_n}{a_n}\right).$${#eq-pha}
+
+We can observe how different $\phi$ values change the starting point of the wave in the plots below.
+
+```{r}
+#| fold: true
+#| message: false
+# Define parameters
+for (i in 1:3){
+t <- seq(0, 2*pi, length.out = 1000)  # time or angle vector
+A <- 1      # amplitude
+f <- 1      # frequency (Hz)
+phi <- i    # phase shift (radians)
+
+# Generate the sinusoidal wave
+y <- A * sin(2 * pi * f * t + phi)
+
+# Plot the wave
+plot(t, y, type = "l", col = "darkred", lwd = 2,
+     xlab = "t", ylab = "Amplitude",
+     main = paste0("Phase =  ", i))
+}
+```
+
+### Small recap
+From the above it might be seen that a specific shape (or shape feature), which emerges from the combination of @eq-x and @eq-y for the x and y axes respectively, cannot be associated with one specific parameter value for any harmonic. Rather, it is the interplay between $\omega$, $A$ and $\phi$ which will finally result in one shape or another. This also means that these variables are not independent, and this must be taken into account to develop the simulation.
+
+# Toolbox
+The objective of the simulation is to reproduce stochastic variation of specific shapes. It can be applied to any kind of artifact, but here we focus on geometric microliths, a specific type of prehistoric arrowhead used in many contexts and periods, but with special prevalence during the Early and Middle Holocene in Europe (see associated paper). Through previous work [@cortell-nicolau_cultural_2020; @cortell-nicolau_geometric_2023], we have estimated that the best compromise between shape resolution and computational efficiency is to use 7 harmonics. However, and depending on the selected shape (for example, pottery shapes or tanged and barbed points), the number of necessary harmonics might differ. 
+
+Before we explicitly define the model and develop the simulation, there are several tools, resources, concepts and caveats that need to be discussed, as follows:
+
+## The Morphospace {#sec-morphospace}
+Attending to @sec-theo, we have a total of four parameters per harmonic ($a_n$, $b_n$, $c_n$ and $d_n$) which in our case, where $N=7$, leaves us with a total of 28 parameters per shape. These parameters are not independent, and it is their interplay which will finally result in one or another shape. In this scenario, it is not feasible to compute which parameter values would be necessary for any desired shape. To solve this, we have decided to use the **morphospace** as the main tool of our simulation. We can define the morphospace as an assemblage of the shapes that we would expect to find in the archaeological record, either from a theoretical or an empirical perspective. Its objective is to estimate parameter values from these known shapes, which will conform the main numeric input for our simulation. As we will see in the sections below, these parameter values will be used in many ways, from estimating parameters (@sec-pars) and restrictions (@sec-rest) to establish target points (@sec-targ) throughout the simulation or to produce the necessary covariance matrix (@sec-covmat). The morphospace can be built from a set of known artifacts (e.g. artifacts that have been collected in the field and digitised). However, for the purpose of this simulation, we have decided to use well-known archaeological *types* as they were defined by Javier @fortea_complejos_1973 for the Iberian Mesolithic. Lengthier discussion on the problems of using archaeologically defined types can be found in the main manuscript, but we use them in this simulation for convenience because this allows us to address further problems, such as the effect of collinearity and small sample sizes on the covariance matrix, as we will see below.
+
+We have, essentially, the following 28 types, as they were originally defined. This is if we consider laterality as different types, and it is not how Fortea classified them, but is it relevant for our approach. There is a somehow more extended discussion on the definition of laterality in lithic types, and its combination with GMM in the associated paper. If we have black .jpg files of these images, we can estimate the parameter values for each of these shapes, as stated in @sec-GMMout. We use the R package `Momocs` [@bonhomme_momocs:_2014] for this. The code below loads the different shapes of the morphospace, as well as produces some utilities and loads custom functions that will be needed further down the line. Our 28 original shapes would look as follows:
+
+
+```{r}
+#| fold: true
+#| message: false
+#| results: 'hide'
+
+#### STEP 1. Load the different outlines (produced in inkscape)
+
+## Load outlines for GMM analysis and perform PCA to extract morphometric value
+## We load already all the libraries that we will need further down the line
+
+library(Momocs) ## For GMM functions
+library(vegan) ## For manual Procrustes
+library(tmvtnorm) ## For truncated multivariate normal
+library(sf) ## to check internal intersections
+library(matrixcalc) ## Check if the covariance matrix is positive definite
+
+## Some utilities
+harm_names <- c("h1", "h2", "h3","h4","h5","h6","h7") # Vector to rename subsequent objects
+n.harm <- 7 # Number of harmonics
+init <- 1 ## Which geometric will start the simulation
+npts <- 120 ## Number of points to rebuild the outline
+
+types <- c("G1.1", "G1.2", "G2", "G3.1", "G3.2", "G4.1",
+	   "G4.2", "G5.1", "G5.2", "G6", "G7.1", "G7.2",
+	   "G9", "G10", "G11", "G12.1", "G12.2", "G13.1",
+	   "G13.2", "G14.1", "G14.2", "G15.1", "G15.2",
+	   "G16.1", "G16.2", "G17.1", "G17.2", "G18")
+
+## Extract outlines
+dir <- getwd()
+setwd("Parametric_space_outlines") ## Set your own path where the jpgs are
+## Parametric_space_outlines is a folder with the oulines.jpgs of the shapes, and it is provided as data within the Simumorph package. It can also be found, individually, at github/acortell3/Simumorph. If the user has downloaded with the package. It can know the path where the files are by running system.file("extdata/Parametric_space_outlines", package = Simumorph"). Then the folder can be moved somewhere else, or the path can be directly substituted here.
+set.seed(1)
+geo_list <- c(1:28)
+geo_list <- paste0(geo_list,".jpg")
+geo_out <- Out(import_jpg(geo_list, auto.notcentered = T), fac = types)
+setwd(dir)
+
+## For simplicity, and to keep this part separated from the package workflow, we can define the functions 'phase' and 'amplitude' here, although they are included in the package.
+phase <- function(x, coordinate = c("x","y")){
+	coordinate <- match.arg(coordinate)
+	if (coordinate == "x"){
+		obj <- x[,c(1,2)]
+	} else if (coordinate == "y"){
+		obj <- x[,c(3,4)]
+	}
+	result <- apply(obj,1,function(x) atan2(x[1],x[2]))
+	return(result)
+}
+
+amplitude <- function(x, coordinate=c("x","y","all")){
+	coordinate <- match.arg(coordinate)
+	if (coordinate == "x"){
+		result <- apply(x,1,function(x) sqrt(x[1]^2+x[2]^2))
+	} else if (coordinate == "y"){
+		result <- apply(x,1,function(x) sqrt(x[3]^2+x[4]^2))
+	} else if (coordinate == "all") {
+		result <- apply(x,1,function(x) sqrt(x[1]^2+x[2]^2+x[3]^2+x[4]^2))
+	}
+	return(result)
+}
+## plot original outlines
+panel(geo_out, dim = c(4,7), col = "gray", main = "original types")
+```
+
+From this point, we can estimate the parameter values for each of our 28 shapes, after centering and scale them through a General Procrustes Analysis (GPA), with the following line of code:
+
+```{r}
+#| fold: true
+#| message: false
+
+morpho_pars <- efourier(coo_center(coo_scale(coo_alignxax(geo_out))),nb.h = n.harm, norm = F, start = T)
+```
+
+## Shape variation
+This section explains how we produce the shape variation given the morphospace described above. In order to simulate shape from non-independent parameters, we will use a truncated multivariate normal distribution (see @sec-mod). Sampling from a multivariate normal distribution relies on a covariance matrix which, in our case, is obtained from the parameters extracted from the morphospace. In the following subsections, we explain (1) potential issues and solutions of the use of covariance matrices given typical parametric values in GMM, (2) further reasoning on our parameter choice and (3) some restrictions that are necessary to produce plausible shapes. 
+
+### Covariance matrix {#sec-covmat}
+
+In order to sample from a multivariate normal distribution, we need to perform a Cholesky decomposition on the covariance matrix. This requires the matrix to be positive definite which, in turn, sets the requirements that this matrix is (1) large enough in relation with the number of covariates and (2) with low degree of collinearity. Likewise, in the associated paper we have also seen how some authors have used covariance matrices directly on the results of PCA analyses (e.g. @polly_simulation_2004) and how this might not the best approach for our specific data, due to the *mosquito wing* problem.
+
+#### Sample size
+We can address the problem of sample size through parametric linear interpolation. See, for instance, how it is used to produce the following shape sequence from shape A to shape B.
+
+```{r}
+#| fold: true
+#| message: false
+#| results: 'hide'
+
+## Load outlines for GMM analysis and perform PCA to extract morphometric value
+types_li <- c("G17.1", "G17.2")
+
+## Extract outlines
+geo_out_li <- slice(geo_out, c(26,27))
+
+## Estimate the parameters for the shapes within the morphospace
+morpho_pars_li <- list() # to store the parameters
+
+## Extract parameters of the two shapes
+morpho_pars_li <- efourier(coo_center(coo_scale(coo_alignxax(geo_out_li))),nb.h = n.harm, norm = F, start = T)
+
+## Interpolate linear values for three middle shapes
+seq_list <- mapply(function(x,y) seq(x,y,length.out = 5),morpho_pars_li[1], morpho_pars_li[2], SIMPLIFY = FALSE)
+
+## Assign them
+sh1 <- morpho_pars_li[1]
+sh2 <- sapply(seq_list, function(x) x[2])
+sh3 <- sapply(seq_list, function(x) x[3])
+sh4 <- sapply(seq_list, function(x) x[4])
+sh5 <- morpho_pars_li[2]
+
+shapes <- list(sh1,sh2,sh3,sh4,sh5) ## to iterate in loop
+
+## Period values
+P <- 1 ## P instead of T to avoid conflicts
+p <- seq(0,1,length.out = npts)
+
+colour <- c("pink","pink1","pink2","pink3","pink4")
+
+## Rebuild and plot
+par(mfrow = c(1,5), mar = c(1,1,1,1), oma = c(0.1,0.1,0.1,0.1))
+for (i in 1:5){
+	sh_pars <- list("an" = shapes[[i]][1:7],
+			"bn" = shapes[[i]][8:14],
+		 	"cn" = shapes[[i]][15:21],
+		 	"dn" = shapes[[i]][22:28])
+	## Build shape coordinates according to Kuhl & Giardina, 1982, but for the paper we use the equivalent momocs function efourier_i()
+	# Build X
+	X <- rep(0,npts)
+	for (h in 1:n.harm){
+		H <- sh_pars$an[h]*cos((2*pi*h*p)/P)+sh_pars$bn[h]*sin((2*pi*h*p)/P)
+		X <- X+H
+	}		
+
+	# Build Y
+	Y <- rep(0,npts)
+	for (h in 1:n.harm){
+		H <- sh_pars$cn[h]*cos((2*pi*h*p)/P)+sh_pars$dn[h]*sin((2*pi*h*p)/P)
+		Y <- Y+H
+	}		
+
+plot(X, Y, type = "n", asp = 1, xlab = "", ylab = "", axes = FALSE)
+polygon(X, Y, col = colour[i], border = "black")
+
+}
+
+
+```
+
+We can use this to increase our sample size, for example, producing pairwise mean shapes among our predefined shapes, which leaves us with a total of 406 shapes, as follows: 
+
+```{r}
+#| fold: true
+#| message: false
+
+expanded_ms <- list()
+mat_index <- 1 ## Need this to populate the matrix
+for (i in 1:length(types)){
+	for (j in i:length(types)){
+		shape <- apply(cbind(morpho_pars[i],morpho_pars[j]),1,mean)
+		expanded_ms[[mat_index]] <- shape
+		mat_index <- mat_index + 1
+	}
+}
+
+#length(expanded_ms)
+
+## Extract parameters without constants
+par_vals <- sapply(expanded_ms,function(x) unlist(x))[c(0:length(types)),]
+
+```
+
+A caveat to have in mind is that mean shapes can be affected by (1) how the initial $(x,y)$ coordinates are extracted and (2) how the General Procrustes Analysis is performed. In the first case this is because the function `import_jpg` from `Momocs` runs an internal randomisation, which can result in slightly different coordinates which, in turn, might return slightly different parameters. In the second case, this is because a GPA includes changes in scale, which means that the exact parameters of a specific shape are relative to the broader morphospace which it is centred into. As discussed in the main paper, there are some solutions to this. For the paper, and because we have enough shapes, we have decided to simply visually explore the extended morphospace and discard the unplausible shapes, in order to build the covariance matrix. 
+
+#### Collinearity
+The procedure in the section above is just a straightforward proposal to increase our sample size. There are more sophisticated approaches but, in any case, because our new shapes will depend on linear interpolation, the collinearity of the parameters within our sample is not reduced. To solve this, we can switch to model with the mathematical properties of the wave $A_n$ and $\phi_n$ instead of the Fourier parameters $a_n$, $b_n$, $c_n$ and $d_n$ using the equations explained in @sec-amp and @sec-pha. This solves the collinearity problem because the computation of $\phi$ is based on periodic functions, which are not linear.  
+
+We can convert our estimated parameters $a_n$, $b_n$, $c_n$ and $d_n$ into $A_n$ and $\phi_n$ with the code below.
+
+```{r}
+#| fold: true
+#| message: false
+
+## Matrix to store amplitude and phase
+amp_pha_mat <- data.frame("Ax1" = rep(0,length(expanded_ms)), "Ay1" = rep(0,length(expanded_ms)), "Ax2" = rep(0,length(expanded_ms)), "Ay2" = rep(0,length(expanded_ms)), "Ax3" = rep(0,length(expanded_ms)), "Ay3" = rep(0,length(expanded_ms)), "Ax4" = rep(0,length(expanded_ms)),"Ay4" = rep(0,length(expanded_ms)),"Ax5" = rep(0,length(expanded_ms)), "Ay5" = rep(0,length(expanded_ms)), "Ax6" = rep(0,length(expanded_ms)), "Ay6" = rep(0,length(expanded_ms)), "Ax7" = rep(0,length(expanded_ms)), "Ay7" = rep(0,length(expanded_ms)),"Phix1" = rep(0,length(expanded_ms)), "Phiy1" = rep(0,length(expanded_ms)), "Phix2" = rep(0,length(expanded_ms)), "Phiy2" = rep(0,length(expanded_ms)), "Phix3" = rep(0,length(expanded_ms)), "Phiy3" = rep(0,length(expanded_ms)), "Phix4" = rep(0,length(expanded_ms)), "Phiy4" = rep(0,length(expanded_ms)), "Phix5" = rep(0,length(expanded_ms)), "Phiy5" = rep(0,length(expanded_ms)), "Phix6" = rep(0,length(expanded_ms)), "Phiy6" = rep(0,length(expanded_ms)), "Phix7" = rep(0,length(expanded_ms)), "Phiy7" = rep(0,length(expanded_ms)))
+
+## Sort matrix per harmonic
+harm1 <- t(par_vals[c(1,8,15,22),])
+harm2 <- t(par_vals[c(2,9,16,23),])
+harm3 <- t(par_vals[c(3,10,17,24),])
+harm4 <- t(par_vals[c(4,11,18,25),])
+harm5 <- t(par_vals[c(5,12,19,26),])
+harm6 <- t(par_vals[c(6,13,20,27),])
+harm7 <- t(par_vals[c(7,14,21,28),])
+
+## Convert to list for looping
+harms <- list(harm1,harm2,harm3,harm4,harm5,harm6,harm7)
+
+## Populate with amplitudes (function comes from source)
+index <- 1 ## For correspondence between list and matrix elements
+for (i in 1:length(harms)){
+	amp_pha_mat[,index] <- amplitude(harms[[i]], coordinate = "x")
+	index <- index + 1
+	amp_pha_mat[,index] <- amplitude(harms[[i]], coordinate = "y")
+	index <- index + 1	
+}
+
+## Populate with phases (function comes from source)
+index <- 15 ## For correspondence between list and matrix elements
+for (i in 1:length(harms)){
+	amp_pha_mat[,index] <- phase(harms[[i]], coordinate = "x")
+	index <- index + 1
+	amp_pha_mat[,index] <- phase(harms[[i]], coordinate = "y")
+	index <- index + 1	
+}
+```
+
+After this, we can produce a covariance matrix for each of our matrices (one using the Fourier parameters and another one produced with $A_n$ and $\phi_n$), and do some exploratory checks on their collinearity. For example, we can see how many of the pairwise correlations of our covariates are above certain threshold (e.g. 80% or 95%), or we can compute a value for mean collinearity as the mean of the pairwise collinearities.
+
+```{r}
+## Compute covariance matrices
+linear_mat <- cov(t(par_vals))
+amp_pha_cov <- cov(amp_pha_mat)
+
+cols_li <- c()
+
+for (i in 1:ncol(linear_mat)){
+	for (j in 1:ncol(linear_mat)){
+		if (i != j){
+			val <- cor(linear_mat[,i],linear_mat[,j])
+			cols_li <- append(cols_li,val)
+		}
+	}
+}
+
+cols_pha <- c()
+
+for (i in 1:ncol(amp_pha_cov)){
+	for (j in 1:ncol(amp_pha_cov)){
+		if (i != j){
+			val <- cor(amp_pha_cov[,i],amp_pha_cov[,j])
+			cols_pha <- append(cols_pha,val)
+		}
+	}
+}
+
+col_res <- data.frame("Total length" = c(length(cols_li),length(cols_pha)),
+		      "Absolute correlation > 0.8" = c(length(which(abs(cols_li) > 0.8)),length(which(abs(cols_pha) > 0.8))),
+		      "Absolute correlation > 0.95" = c(length(which(abs(cols_li) > 0.95)),length(which(abs(cols_pha) > 0.95))),
+		      "Percentage absolute correlation > 0.8" = c(length(which(abs(cols_li) > 0.8))/length(cols_li),length(which(abs(cols_pha) > 0.8))/length(cols_pha)),
+		      "Percentage absolute correlation > 0.95" = c(length(which(abs(cols_li) > 0.95))/length(cols_li),length(which(abs(cols_pha) > 0.95))/length(cols_pha)),
+		      "Mean absolute correlation" = c(mean(abs(cols_li)), mean(abs(cols_pha))),
+check.names = FALSE)
+
+rownames(col_res) <- c("Fourier parameters", "Amplitudes and phases")
+
+knitr::kable(col_res, format = "html", digits = 2)
+
+```
+
+Finally, we can check how the matrix produced through the Fourier parameters $a_n$, $b_n$, $c_n$ and $d_n$ is not positive definite, whilst the one produced with amplitudes and phases is positive definite.
+
+```{r}
+#| fold: true
+#| message: false
+
+is.positive.definite(linear_mat)
+is.positive.definite(amp_pha_cov)
+```
+
+### Parameters {#sec-pars}
+The section above is the main reason why we will produce our simulation relying on the mathematicla properties of the harmonics ($A_n$ and $\phi_n$), rather than the Fourier parameters ($a_n$, $b_n$, $c_n$, $d_n$), but it is not the only one. Amplitude and phase (and frequency) are the actual variables that control a harmonic, independently of the methods used to define or analyse it (e.g. Fourier decomposition). In contexts like ours, with high parametric variance, the complex interplay between the different Fourier parameters eventually produces unplausible jumps and shapes during the simulation drift. Even having a covariance matrix, if the variance is high in high dimensional spaces, small changes in our correlation structure might result in dramatic impacts on the shape produced, because working directly with parameters does not necessarily respect the amplitude and phase structure which ultimately produce the final shape. Even if they are forced to be dependent, small changes in the parameter values during the drift, where the values at $t$ depend on the values at $t-1$, might result in (1) not respecting the parameter hierarchies (e.g. higher order harmonics might have wider ranges than lower order harmonics) and (2) drift to extreme values for one or more parameters. Because working directly with the Fourier parameters does not necessarily establish an explicit link with the amplitude and phase of the harmonics, all of this might result in changes of phase or unstructured amplitudes which, in the last instance, end up producing unrealistically abrupt shape changes or, worst, unplausible shapes. In short, working '*blindly*' with the Fourier parameters does not necessarily assure that our amplitude and phase relationships are respected which, during drifts, ends up producing unrealistic shapes.
+
+Thus, working directly with phase and amplitude gives a higher control of the harmonic shape. Admittedly, this poses some mathematical issues, such as the fact that we are working with periodic functions, which challenges the assumption of normal distribution for our parameters. But these can be dealt with, as we will see below. On top of this, because Fourier parameters can easily be computed back from the resulting shapes, we can resort back to those on the simulated shapes in case we needed tests of common use within the GMM approach which assume normality (e.g. manova).
+
+### Restrictions {#sec-rest}
+
+In order to assure a realistic and smooth simulation, we have established two restrictions as follows:
+
+#### Truncation on multivariate normal
+One of the most important concepts is that of the harmonic hierarchy where $A_n > A_{n+1}$. While this is broadly addressed by the use of a covariance matrix, as we have seen above the parametric values can go to unrealistic ranges during drift. This also affects the phase values, with range $\phi_n[-\pi,\pi]$. In order to solve this, instead of sampling from a multivariate normal distribution, we use a truncated multivariate normal distribution, where we establish range boundaries for $A_n$ and $\phi_n$. 
+
+##### Amplitude
+The upper and lower thresholds for $A_n$ are defined by the ones observed in the parametric space. Let $\mathbf{A}$ be the section of the covariance matrix with the amplitude values from the shapes within our morphospace, with dimensions $I \times J$, where $A_{ij}$ is the $i$-th shape and the $j$-th harmonic. If $\vec{A}_\max$ is the vector with the upper boundary for our truncated multivariate normal and $\vec{A}_\min$ is the vector for the lower boundary, then:
+
+$$\left[\vec{A}_{\max}\right]_j = \max_{1 \leq i \leq I} A_{ij}, \qquad
+\left[\vec{A}_{\min}\right]_j = \min_{1 \leq i \leq I} A_{ij}.$$
+
+This can be easily put into code as:
+
+```{r}
+#| fold: true
+#| message: false
+
+## For code simplicity, here we work in the values of the full covariance matrix. The values for phase will be overriden in the code snippet in the next subsection.
+
+upper_thres <- apply(amp_pha_mat,2,max)
+lower_thres <- apply(amp_pha_mat,2,min)
+
+```
+
+
+##### Phase
+As for $\phi_n$, this is a bit trickier. As above, we can consider $\mathbf{P}$ the section of the covariance matrix with the phase values from the shapes of our morphospace, with dimensions $I \times J$, with $\vec{\phi}_\max$ being the vector for the upper boundary and $\vec{\phi}_\min$ the one for the lower boundary. Because phase is a circular variable, then its upper and lower thresholds are globably restricted by
+
+$$\vec{\phi}_\max = \pi, \qquad \vec{\phi}_\min = -\pi.$$
+
+But modelling the phase presents an additional challenge because certain extreme combinations of phase values such as, for example, $\mathrm{sin}(\phi_{x1}) \approx \mathrm{sin}(\phi_{yn})$ combined with $\mathrm{cos}(\phi_{x1}) \not\approx \mathrm{cos}(\phi_{yn})$, can give place to wiggly forms. To account for this, we have decided to include a local restriction, which solves this problem by smoothing the simulation overall and, combined with the target-based approach (@sec-targ), avoids sudden changes of phase. To do this, we include a threshold value $\alpha$, such that
+
+$$\phi_{t-1} - \alpha < \phi_t < \phi_{t-1} + \alpha.$$
+
+```{r}
+#| fold: true
+#| message: false
+
+
+phase_thres <- 0.5 ## Tau limit to allow phase variation
+
+## Populate phases with the new values. The rows from amp_pha_mat here are randomly the shape 28. In the simulation it would be shape at t-1.
+lower_thres[15:28] <- unlist(as.data.frame(amp_pha_mat[28,15:28])) - phase_thres
+upper_thres[15:28] <- unlist(as.data.frame(amp_pha_mat[28,15:28])) + phase_thres
+ 	
+## If the obtained values exceed pi or -pi, bound to [-pi,pi]	
+lower_thres[15:28] <- pmin(pmax(lower_thres[15:28],-pi),pi)
+upper_thres[15:28] <- pmin(pmax(upper_thres[15:28],-pi),pi)
+
+```
+
+#### Restriction on crossing lines
+
+The restrictions above impede sudden shape changes and unrealistic shapes (e.g. laces), but although they strongly reduce them, they do not completely avoid line intersections, which might still occasionally occurr in the extremes of the shapes. We avoid this algorithmically, by treating the shapes as spatial objects (just sets of $(x,y)$ coordinates) and applying the R function ``st_is_valid``, from the R package ``sf`` [@pebesma_spatial_2023], which checks the topological validity of a given geometry. If the function returns an invalid geometry (e.g. line-intersection), the simulation candidate for $t$ is not accepted and it is resampled from $t-1$.
+
+## Targets {#sec-targ}
+
+This is the final tool that we use to complete the simulation, and it is in combination with all of the above. The rationale is simple, because at this stage it is not possible to reliably predict the parameter values that would produce specific shapes, a *safety check* is produced every time a new shape is produced. For this check, we compute the Procrustes distance between the shape and a given target and accept it only if it is below a specific threshold $\epsilon$. 
+
+This approach offers substantial versatility, since it can be implemented in very different ways. For instance, we might want to simulate the transition from a given shape A to a shape B, where phase B would be our target. We might also use in a way so that all our simulations remain relatively close to a specific given shape (which is what what we will do in the last section of this tutorial), or we can implement several target shapes to allow shifting among potential types without loosing morphometric plausability. Finally, if we want to give significant amounts of freedom to the evolutionary drift to explore on the emergence of previously unseen shapes, we can give a large value for $\epsilon$, which would effectively reduce the importance of the targets to a minimum and give more freedom to the simulation. All these different options have been included in the provided R package. 
+
+# Model and simulation {#sec-mod}
+
+By now we know that we have an amplitude and phase value per coordinate and harmonic. Thus, from our morphometric space, we obtain the following matrix
+
+$$
+\mathbf{M} = \begin{pmatrix}
+\vec{V}_1 \\
+\vec{V}_2 \\
+\vdots \\
+\vec{V}_N
+\end{pmatrix} = 
+\begin{pmatrix}
+A_{1x1} & \cdots & A_{1x7} & A_{1y1} & \cdots & A_{1y7} & \phi_{1x1} & \cdots & \phi_{1x7} & \phi_{1y1} & \cdots & \phi_{1y7} \\
+A_{2x1} & \cdots & A_{2x7} & A_{2y1} & \cdots & A_{2y7} & \phi_{2x1} & \cdots & \phi_{2x7} & \phi_{2y1} & \cdots & \phi_{2y7} \\
+\vdots & \ddots & \vdots & \vdots & \ddots & \vdots & \vdots & \ddots & \vdots & \vdots & \ddots & \vdots \\
+A_{Nx1} & \cdots & A_{Nx7} & A_{Ny1} & \cdots & A_{Ny7} & \phi_{Nx1} & \cdots & \phi_{Nx7} & \phi_{Ny1} & \cdots & \phi_{Ny7}
+\end{pmatrix},
+$$
+
+which can be transformed into the positive definite covariance matrix $\Sigma = MM^T$.
+
+From here, we can estimate each new shape as
+
+$$\tilde{\vec{V}}_t^\mathsf{T} \sim N_T(\mu,\Sigma),$$
+
+where
+
+
+$$\mu = \begin{cases}
+    \vec{V}_s & \text{if } t = 1 \\
+    \vec{V}_{t-1} & \text{if } t > 1,
+\end{cases}$$
+
+and $\vec{V}_s$ represents one single shape within our morphospace, to be chosen by the modeller. Of course, as a starting point, the user can decide other options. Attending to all of the above, we reproduce stochastic variation from one initial shape through 20 time steps with the following code:
+
+<span style="font-size: 11px;">*The code below will not run on a stand-alone, since it uses the objects and functions used in the previous chunks.*</span>
+
+```{r}
+#| fold: true
+#| message: false
+#| fig-width: 14
+#| fig-height: 10
+
+sim <- 20 # number of simulations
+amp_pha <- amp_pha_mat[init,] ## We start from G1.1
+
+## Threshold for distance
+proc_thres <- 0.5
+
+## Store simulation figures
+simuls <- list()
+
+index <- 1
+
+par(mfrow = c(4,5))
+
+while (index <= sim){
+	## Set lower and upper threshold of the phases
+	lower_thres[15:28] <- unlist(as.data.frame(amp_pha[15:28])) - phase_thres
+	upper_thres[15:28] <- unlist(as.data.frame(amp_pha[15:28])) + phase_thres
+ 	
+	## Bound phases to [-pi,pi]	
+	lower_thres[15:28] <- pmin(pmax(lower_thres[15:28],-pi),pi)
+	upper_thres[15:28] <- pmin(pmax(upper_thres[15:28],-pi),pi)
+	
+	cand_vals <- rtmvnorm(1,mean = unlist(as.data.frame(amp_pha)), sigma = amp_pha_cov/100, lower = lower_thres, upper = upper_thres) # reduce the values of the covariance matrix without changing the correlation structure
+
+	Ax <- cand_vals[c(1,3,5,7,9,11,13)]
+	Ay <- cand_vals[c(2,4,6,8,10,12,14)]
+	Phyx <- cand_vals[c(15,17,19,21,23,25,27)]
+	Phyy <- cand_vals[c(16,18,20,22,24,26,28)]
+		
+	# Recompute parameters from amplitude and phase
+	mat_par_vals <- data.frame("an" = Ax*sin(Phyx),
+				   "bn" = Ax*cos(Phyx),
+			     	   "cn" = Ay*sin(Phyy),
+			     	   "dn" = Ay*cos(Phyy))	
+	
+	## Convert to list
+	mat_par_vals_l <- list("an" = mat_par_vals[,1],
+			     "bn" = mat_par_vals[,2],
+			     "cn" = mat_par_vals[,3],
+			     "dn" = mat_par_vals[,4])
+	
+	## Build candidate_f
+	candidate_f <- efourier_i(mat_par_vals_l, nb.h = n.harm, nb.pts = npts) # So far first shape
+	candidate_f_check <- rbind(candidate_f,candidate_f[1,])## Close polygon for validity
+	candidate_f_check <- st_polygon(list(candidate_f_check))
+	
+	if(st_is_valid(candidate_f_check)){
+		## Manually center, scale and rotate shapes for distance computation
+		candidate_s <- coo_sample(coo_center(coo_scale(candidate_f)), n  = npts)
+		
+		## Create reference object to compare distances. In this case, we compare every shape to G1.1, so it won't deviate much from it
+		coeff_list <- list("an" = morpho_pars[1][1:7],
+				   "bn" = morpho_pars[1][8:14],
+		   	   	   "cn" = morpho_pars[1][15:21],
+		   	   	   "dn" = morpho_pars[1][22:28])
+		ref_shape <- efourier_i(coeff_list, nb.h = n.harm, nb.pts = npts) # So far first shape
+		ref_shape <- coo_sample(ref_shape, n = 120)
+		
+		# Center
+		ref_centered <- scale(ref_shape, scale = FALSE, center = TRUE)
+		cand_centered <- scale(candidate_s, scale = FALSE, center = TRUE)
+	
+		# Scale to unit size
+		ref_scaled <- ref_centered / sqrt(sum(ref_centered^2))
+		cand_scaled <- cand_centered / sqrt(sum(cand_centered^2))
+	
+		# Rotate candidate for best match
+		svd_result <- svd(t(ref_scaled) %*% cand_scaled)
+		rotation_matrix <- svd_result$v %*% t(svd_result$u)
+		cand_aligned <- cand_scaled %*% rotation_matrix
+
+		## Compute Procrustes distance
+		proc_dist <- sqrt(procrustes(ref_scaled,cand_aligned,scale = TRUE)$ss)
+	
+		if (proc_dist <= proc_thres){
+			plot(cand_aligned, type = "l", cex = 0.1, xlab = "", ylab = "", main = paste0("t = ",index))
+			index <- index + 1
+		}
+	}
+}
+```
+
+# Simumorph
+We have compiled all the above functions within the `Rpackage Simumorph`, so that the user does not have to code all of it itself. Here we show a basic workflow of how a quick simulation would work. Let's start by installing and loading the package.
+```{r}
+#| fold: true
+#| message: false
+## Clean session to start with the package afresh
+rm(list = ls(envir = .GlobalEnv), envir = .GlobalEnv) ## Remove previously loaded functions and objects
+for (pkg in c("Momocs", "vegan", "tmvtnorm", "sf", "matrixcalc")) { 
+  try(detach(paste0("package:", pkg), unload = TRUE, character.only = TRUE), silent = TRUE)
+} ## detach previously loaded packages
+
+#install(devtools) if not installed
+#devtools::install_github("acortell3/Simumorph")
+library(Simumorph)
+```
+
+First, we need shapes, which we will use for our morphospace. In our case, the shapes provided above are included as example data within the package, and are ready to use, but we would advise (and encourage) the user to use its own empiric data. The object here is the same as above, so we can also plot them, again just as above.
+```{r}
+#| fold: true
+#| message: false
+
+data("geo_out")
+
+## Plot it
+Momocs::panel(geo_out, dim = c(4,7), col = "aquamarine4", main = "original types")
+```
+
+We have already seen in detail how each element is built within the package, so here we just need to go to the execution of the workflow. We need a morphospace and, in particular, an extended morphospace. We can easily build it as follows:
+
+```{r}
+#| fold: true
+#| message: false
+## We can consider naming the shapes for clarity
+types <- c("G1.1", "G1.2", "G2", "G3.1", "G3.2", "G4.1",
+	   "G4.2", "G5.1", "G5.2", "G6", "G7.1", "G7.2",
+	   "G9", "G10", "G11", "G12.1", "G12.2", "G13.1",
+	   "G13.2", "G14.1", "G14.2", "G15.1", "G15.2",
+	   "G16.1", "G16.2", "G17.1", "G17.2", "G18")
+mrsp <- morphospace(x = geo_out, expand = T, mode = "mean", cov.mat = T, n.harm = 7, type.names = types)
+
+## Extract only Amplitudes and phases for posterior management
+mrsp_APhi <- mrsp[[2]]
+## Extrac the covariance matrix
+mrsp_cov <- mrsp[[3]]
+
+```
+
+With the code above we have built an extended morphospace (`expand = T`) from the provided shapes (`x = geo_out`) through pairwise linear interpolation (`mode = "mean"`, currently the only implemented method) with seven harmonics (`n.harm = 7`) per shape and type names extracted from the vector `types`. The resulting object is a list with three elements, where the first element is a list with the original Fourier coefficients, the second element a data frame with $A$ and $\phi$ values for each object within the extended morphometric space and the third is the resulting covariance matrix. If `cov.mat = F` the list has only two elements and the covariance matrix is not produced. 
+
+Currently, the main simulation can support four basic methods, as follows:
+
+1. `"AtoA"`. An initial shape "A" is provided and the simulation stays broadly close to it, depending on the level $\epsilon$
+2. `"AtoB"`. An initial shape "A" and a target shape "B" are provided. The simulation slowly moves towards "B".
+3. `"AtoMult"`. An initial shape "A", along with tow or more target shapes (it can be the full morphospace) are provided. The simulation can move freely as long as it stays at $\epsilon$ distance from any or the provided shapes.
+4. `"Free"`. An initial shape "A" is provided, but not targets. The simulation moves freely, and it can drift towards shapes that have not not been observed within the archaeological record. If in the case 1 ("AtoA"), the value of $\epsilon$ is high, its results might approach this one. 
+
+We will focus on the case `"AtoB"`. The user could (and should) try with different modes. Let's first make sure that our initial and target shapes are indeed the ones that we want through visual inspection. We can select them, and build single shapes from their $A_n$ and $\phi_n$ values using the function `build_s`. In the arguments below, essentially we load the shapes from the morphospace, specifying that it is one single shape (`sing.vals = F`), given a number of $x,y$ coordinate-points `np` and specifying that we do not want to extract the Fourier parameters as well (`fou.pars = F`), since we do not need them for the remainder of the simulation.
+
+```{r}
+#| fold: true
+#| message: false
+## We find the number of x,y coordinates we want to extract
+np <- 120
+
+## Rebuild initial shape
+init_shape <- build_s(x = mrsp_APhi[1,], sing.vals = F, fou.pars = F, npts = np)
+## Rebuild target shape
+target_shape <- build_s(x = mrsp_APhi[406,], sing.vals = F, fou.pars = F, npts = np)
+
+par(mfrow = c(1,2))
+plot(init_shape, type = "l", col = "darkred", lwd = 2, asp = 1, main = "Initial shape = G1")
+plot(target_shape, type = "l", col = "darkred", lwd = 2, asp = 1, main = "Target shape = G18")
+```
+
+We can compute the Procrustes distance from these two shapes in order to have a reference for the value of $\epsilon$ during the simulation.
+
+```{r}
+#| fold: true
+#| message: false
+proc_dist(shape1 = init_shape, shape2 = target_shape, multi = F)
+```
+
+With all of the above, we can finally perform the simulation. Let's consider a simulation where we will go from shape A to shape B, allowing an initial distance of $\epsilon = 0.25$, based on the distance computed above. In this case, we will only produce the shapes (`only.shapes = T`) and we will allow the simulation to run for 100 times (`sim = 100`). While running the function, the step of the simulation is printed for guidance to the user. We only show 20 shapes, from the full 100 due to space reasons. While the simulation works,it prints the number of the simulation for guidance. The parameter `max.attempts` is there because, if $\epsilon$ is too low, the simulation might get stuck. This parameter stops the function if the number of attempts without distances lower to $\epsilon$ reaches the value in `max.attempts` (default is 500). An error message is generated, advising to increase $\epsilon$. The case of the method "AtoB" is special. This is because $\epsilon$ works differently here. Here, a simulation at step $t$ is accepted if the distance from that simulation to the target is lower than the distance at $t-1$. By definition, and for a long sequence, this can get the chain stuck. In this case, and after the number of attempts in `max.attempts` is reached, $\epsilon$ is increased and a warning is generated informing on where at which $t$ has $\epsilon$ been increased.
+
+```{r}
+#| fold: true
+#| message: false
+set.seed(123)
+results <- simumorph(x = mrsp_cov, m.space = mrsp_APhi, init = 1, target = 406, method = "AtoB", sim = 100, npts = np, a = 0.4, e = 0.25, f = 100, only.shapes = T, max.attempts = 500)
+
+## Build a vector to select 20 shapes from the provided 100
+shape_index <- round(seq(1,100,length.out = 20))
+
+par(mfrow = c(4,5), mar = c(1,1,1,1), oma = c(0.1,0.1,0.1,0.1))
+for (i in 1:20){
+	plot(results[[shape_index[i]]], asp = 1, type = "l", xlab = "", ylab = "", main = paste0("t = ",shape_index[[i]]), axes = F)
+	polygon(results[[shape_index[i]]], asp = 1, col = "lightcyan3") 
+
+}
+```
+
+From here, the user can start playing with the different options of the package (also look into help() for function specs). More vignettes and functions (hopefully) coming soon!
+
+## References
+
