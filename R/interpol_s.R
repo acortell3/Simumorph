@@ -36,7 +36,7 @@ interpol_s <- function(shape1, shape2, method = c("mean","sequence","weighted"),
 		warning("You've chosen method = mean  but n.shapes != NULL. Are you sure that's what you want?")
 	} else if (method == "sequence" & is.null(n.shapes)){
 		stop("You've chosen method == sequence, but have not provided the number of shapes you want")
-	} else if (!(method %in% c("mean","sequence"))){
+	} else if (!(method %in% c("mean","sequence","weighted"))){
 		stop("Selected method not currently supported")
 	}
 	
@@ -124,9 +124,6 @@ interpol_s <- function(shape1, shape2, method = c("mean","sequence","weighted"),
 		
 		new_shape <- build_s(val_vec, sing.vals = F, fou.pars = fou.pars, npts = npts)
 		return(new_shape)
-	}
-	else if (!(method %in% c("mean","sequence","weighted"))){
-		stop("Selected method not currently supported")
 	}
 }
 
