@@ -22,6 +22,9 @@
 #' 
 #' @export
 interpol_s <- function(shape1, shape2, method = c("mean","sequence","weighted"), n.shapes = NULL, npts, fou.pars = F, w = c(0.5,0.5)){
+	
+	method <- match.arg(method)
+
 	## Check/produce errors/warnings
 	if (! (inherits(shape1, "list") || inherits(shape1, "data.frame"))) {
 		stop("Error: shape1 must be a list or a data.frame")
