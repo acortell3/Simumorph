@@ -7,10 +7,11 @@
 interpol_s(
   shape1,
   shape2,
-  method = c("mean", "sequence"),
+  method = c("mean", "sequence", "weighted"),
   n.shapes = NULL,
   npts,
-  fou.pars = F
+  fou.pars = F,
+  w = c(0.5, 0.5)
 )
 }
 \arguments{
@@ -18,11 +19,13 @@ interpol_s(
 
 \item{shape2}{A data frame or matrix with columns \code{an}, \code{bn}, \code{cn}, and \code{dn}. It can also be a list with elements \code{an}, \code{bn}, \code{cn} and \code{dn}}
 
-\item{method}{Character. Specifies whether a single mean shape is computed or a sequence of intermediate shapes between shape1 and shape2. More methods will be implemented in the future}
+\item{method}{Character. Specifies whether a single mean shape is computed, a sequence of intermediate shapes between shape1 and shape2, or a weighted mean is computed. More methods will be implemented in the future}
 
 \item{npts}{Integer. Number of points to use in the reconstructed shape.}
 
 \item{fou.pars}{Logical. If \code{TRUE}, the function returns a list containing the Fourier parameters and the reconstructed shape coordinates. Default is \code{FALSE}.}
+
+\item{w}{If method = "weighted", a vector with two values for the weights for each shape}
 
 \item{n.shapes.}{If method = "sequence", the number of interpolated shapes}
 }

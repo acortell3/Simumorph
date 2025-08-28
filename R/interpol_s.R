@@ -7,11 +7,11 @@
 #' 
 #' @param shape1 A data frame or matrix with columns \code{an}, \code{bn}, \code{cn}, and \code{dn}. It can also be a list with elements \code{an}, \code{bn}, \code{cn} and \code{dn}
 #' @param shape2 A data frame or matrix with columns \code{an}, \code{bn}, \code{cn}, and \code{dn}. It can also be a list with elements \code{an}, \code{bn}, \code{cn} and \code{dn}
-#' @param method Character. Specifies whether a single mean shape is computed or a sequence of intermediate shapes between shape1 and shape2. More methods will be implemented in the future
+#' @param method Character. Specifies whether a single mean shape is computed, a sequence of intermediate shapes between shape1 and shape2, or a weighted mean is computed. More methods will be implemented in the future
 #' @param n.shapes. If method = "sequence", the number of interpolated shapes
 #' @param fou.pars Logical. If `TRUE`, the function returns a list containing the Fourier parameters and the reconstructed shape coordinates. Default is `FALSE`.
-#'  
 #' @param npts Integer. Number of points to use in the reconstructed shape.
+#' @param w If method = "weighted", a vector with two values for the weights for each shape
 #'
 #' @return 
 #' If `fou.pars = FALSE`, returns a matrix of shape coordinates (x,y).  
@@ -21,7 +21,7 @@
 #' If `method = "sequence"`, returns a list with length = sequence. Each element within the list is structured as above
 #' 
 #' @export
-interpol_s <- function(shape1, shape2, method = c("mean","sequence"), n.shapes = NULL, npts, fou.pars = F){
+interpol_s <- function(shape1, shape2, method = c("mean","sequence","weighted"), n.shapes = NULL, npts, fou.pars = F, w = c(0.5,0.5)){
 	## Check/produce errors/warnings
 	if (! (inherits(shape1, "list") || inherits(shape1, "data.frame"))) {
 		stop("Error: shape1 must be a list or a data.frame")
@@ -97,7 +97,32 @@ interpol_s <- function(shape1, shape2, method = c("mean","sequence"), n.shapes =
 			new_shapes[[i]] <- build_s(val_vec, sing.vals = F, fou.pars = fou.pars, npts = npts)
 		} 
 		return(new_shapes)
-	} else if (!(method %in% c("mean","sequence"))){
+	} else if (method == "weighted"){
+		
+		## Interpolate value
+		new_shape <- apply(df_ss,1,function(x) sum(x*w) / sum(w))
+		n.harm <- length(new_shape)/4 ## Define n.harm from source
+		## Assign Fourier parameters
+		f.pars <- data.frame("an" = new_shape[1:n.harm],
+				     "bn" = new_shape[(1+n.harm):(n.harm*2)],
+				     "cn" = new_shape[(1+n.harm*2):(n.harm*3)],
+				     "dn" = new_shape[(1+n.harm*3):length(new_shape)])
+		## Compute amplitudes and phases and create vector
+		amps_x <- amplitude(f.pars, coordinate = "x")
+		amps_y <- amplitude(f.pars, coordinate = "y")
+		phi_x <- phase(f.pars, coordinate = "x")
+		phi_y <- phase(f.pars, coordinate = "y")
+
+		## Vector for amp/phase values
+		val_vec <- rep(NA,length(new_shape))
+		
+		val_vec[seq(1,length(val_vec)-1, by = 2)] <- c(amps_x,phi_x)
+		val_vec[seq(2,length(val_vec), by = 2)] <- c(amps_y,phi_y)
+		
+		new_shape <- build_s(val_vec, sing.vals = F, fou.pars = fou.pars, npts = npts)
+		return(new_shape)
+	}
+	else if (!(method %in% c("mean","sequence","weighted"))){
 		stop("Selected method not currently supported")
 	}
 }
