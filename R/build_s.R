@@ -24,6 +24,12 @@
 #' 
 #' @export
 build_s <- function(x, sing.vals = F, fou.pars = F, npts){
+
+	if (sing.vals == F){
+		if (isTRUE(is.data.frame(x))){
+			warning("You've said sing.vals == F, but x is a data frame. This can have unexpected results. Are you sure that's what you want?")
+		}
+	}
 	
 	if (sing.vals == F){ 
 		if (isTRUE(is.data.frame(x))){
