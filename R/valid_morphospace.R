@@ -8,7 +8,7 @@
 #' @param x The matrix with the full morphospace
 #' @param k the number of eigen values to include. Must be higher than 1
 #' @param rnd Number of randomisations. Default is 100
-#' @param plotvalues Boolean. Whether the user wants to visualise also the eigenvalues. If F, it only plots the dot product of the eigenvectors and the minimum eigenvalues. Default is F
+#' @param plotvalues Boolean. Whether the user wants to visualise also the eigenvalues. If F, it only plots the dot product of the eigenvectors and the minimum eigenvalues. Default is T
 #'
 #' @export
 #' 

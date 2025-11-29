@@ -13,7 +13,7 @@ valid_morphospace(x, k, rnd, plotvalues = T)
 
 \item{rnd}{Number of randomisations. Default is 100}
 
-\item{plotvalues}{Boolean. Whether the user wants to visualise also the eigenvalues. If F, it only plots the dot product of the eigenvectors and the minimum eigenvalues. Default is F}
+\item{plotvalues}{Boolean. Whether the user wants to visualise also the eigenvalues. If F, it only plots the dot product of the eigenvectors and the minimum eigenvalues. Default is T}
 }
 \value{
 A plot showing the directions of the eigenvectors and the minimum eigenvalues. If \code{plotvalues = TRUE} it also shows the k eigenvalues
