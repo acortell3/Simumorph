@@ -10,12 +10,15 @@
 #' @param rnd Number of randomisations. Default is 100
 #' @param plotvalues Boolean. Whether the user wants to visualise also the eigenvalues. If F, it only plots the dot product of the eigenvectors and the minimum eigenvalues. Default is T
 #'
+#' @param msize mapped into \code{cex.main} to control title size
+#' @param lsize mapped into \code{cex.lab} to control label size
+#' @param trans mapped into \code{alpha.f} to control the transparency of the non-acceptance region
 #' @export
 #' 
 #' @return
 #' A plot showing the directions of the eigenvectors and the minimum eigenvalues. If \code{plotvalues = TRUE} it also shows the k eigenvalues 
 
-valid_morphospace <- function(x,k,rnd,plotvalues = T){
+valid_morphospace <- function(x,k,rnd,plotvalues = T, msize = 1.2, lsize = 1, trans = 0.2){
 
 	pb <- txtProgressBar(min = 0, max = rnd, style = 3)
 	if (k == 1){
@@ -64,17 +67,17 @@ valid_morphospace <- function(x,k,rnd,plotvalues = T){
 		} else {
 			par(mfrow = c(round(sqrt(k+2)),round(sqrt(k+2))))
 		}
-		plot(x = eigen_vals$Obs, y = eigen_vals$eVector, pch = 16, col = adjustcolor("hotpink3", alpha.f = 0.2), xlab = "n samples", ylab = "value", main = paste0("Eigenvector dot product (k = ",k,")"))
-		plot(x = eigen_vals$Obs, y = eigen_vals$eValuemin, col = adjustcolor("olivedrab4", alpha.f = 0.2), xlab = "n samples", ylab = "value", pch = 16, main = "Minimum eigenvalue")
-		polygon(x = c(0,0,nrow(x)+50,nrow(x)+50), y = c(-0.05,1e-6,1e-6,-0.05), col = adjustcolor("pink",alpha.f=0.2), border = "red", lty =2)
+		plot(x = eigen_vals$Obs, y = eigen_vals$eVector, pch = 16, col = adjustcolor("hotpink3", alpha.f = 0.2), xlab = "n samples", ylab = "value", main = paste0("Eigenvector dot product (k = ",k,")"), cex.main = msize, cex.lab = lsize)
+		plot(x = eigen_vals$Obs, y = eigen_vals$eValuemin, col = adjustcolor("olivedrab4", alpha.f = 0.2), xlab = "n samples", ylab = "value", pch = 16, main = "Minimum eigenvalue", cex.main = msize, cex.lab =lsize)
+		polygon(x = c(0,0,nrow(x)+50,nrow(x)+50), y = c(-0.05,1e-6,1e-6,-0.05), col = adjustcolor("pink",alpha.f=trans), border = "red", lty =2)
 		for (i in 1:k){
-			plot(x = eigen_vals$Obs, y = eigen_vals[,i+1], pch = 16, col = adjustcolor("lightseagreen", alpha.f = 0.2), xlab = "n samples", ylab = "value", main = paste0("eigenvalue",i))
+			plot(x = eigen_vals$Obs, y = eigen_vals[,i+1], pch = 16, col = adjustcolor("lightseagreen", alpha.f = 0.2), xlab = "n samples", ylab = "value", main = paste0("eigenvalue",i), cex.main = msize, cex.lab = lsize)
 		}
 	} else {
 		par(mfrow = c(1,2))
-		plot(x = eigen_vals$Obs, y = eigen_vals$eVector, pch = 16, col = adjustcolor("hotpink3", alpha.f = 0.2), xlab = "n samples", ylab = "value", main = paste0("Eigenvector dot product (k = ",k,")"))
-		plot(x = eigen_vals$Obs, y = eigen_vals$eValuemin, col = adjustcolor("olivedrab4", alpha.f = 0.2), xlab = "n samples", ylab = "value", pch = 16, main = "Minimum eigenvalue")
-		polygon(x = c(0,0,nrow(x)+50,nrow(x)+50), y = c(-0.05,1e-6,1e-6,-0.05), col = adjustcolor("pink",alpha.f=0.2), border = "red", lty =2)
+		plot(x = eigen_vals$Obs, y = eigen_vals$eVector, pch = 16, col = adjustcolor("hotpink3", alpha.f = 0.2), xlab = "n samples", ylab = "value", main = paste0("Eigenvector dot product (k = ",k,")"), cex.main = msize, cex.lab = lsize)
+		plot(x = eigen_vals$Obs, y = eigen_vals$eValuemin, col = adjustcolor("olivedrab4", alpha.f = 0.2), xlab = "n samples", ylab = "value", pch = 16, main = "Minimum eigenvalue", cex.main = msize, cex.lab = lsize)
+		polygon(x = c(0,0,nrow(x)+50,nrow(x)+50), y = c(-0.05,1e-6,1e-6,-0.05), col = adjustcolor("pink",alpha.f=trans), border = "red", lty =2)
 	}
 }
 	

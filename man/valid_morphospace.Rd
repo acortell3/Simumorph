@@ -4,7 +4,15 @@
 \alias{valid_morphospace}
 \title{Check matrix validity}
 \usage{
-valid_morphospace(x, k, rnd, plotvalues = T)
+valid_morphospace(
+  x,
+  k,
+  rnd,
+  plotvalues = T,
+  msize = 1.2,
+  lsize = 1,
+  trans = 0.2
+)
 }
 \arguments{
 \item{x}{The matrix with the full morphospace}
@@ -14,6 +22,12 @@ valid_morphospace(x, k, rnd, plotvalues = T)
 \item{rnd}{Number of randomisations. Default is 100}
 
 \item{plotvalues}{Boolean. Whether the user wants to visualise also the eigenvalues. If F, it only plots the dot product of the eigenvectors and the minimum eigenvalues. Default is T}
+
+\item{msize}{mapped into \code{cex.main} to control title size}
+
+\item{lsize}{mapped into \code{cex.lab} to control label size}
+
+\item{trans}{mapped into \code{alpha.f} to control the transparency of the non-acceptance region}
 }
 \value{
 A plot showing the directions of the eigenvectors and the minimum eigenvalues. If \code{plotvalues = TRUE} it also shows the k eigenvalues
