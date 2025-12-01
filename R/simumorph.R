@@ -49,14 +49,14 @@ simumorph <- function(x, m.space, init, init.from.morphospace = T, target, targe
 	if (method == "Free" | method == "AtoA"){
 		target <- init		
 		tar_vals <- m.space[init,]
-		tar_shape <- build_s(m.space[init,], fou.pars = F, npts = npts)
+		tar_shape <- build_s(unlist(m.space[init,]), fou.pars = F, npts = npts)
 	} else if (method == "AtoB"){
 		tar_vals <- m.space[target,]
-		tar_shape <- build_s(m.space[target,], fou.pars = F, npts = npts)
+		tar_shape <- build_s(unlist(m.space[target,]), fou.pars = F, npts = npts)
 	} else if (method == "AtoMult"){
 		tar_shape <- list()
 		for (i in 1:length(target)){
-			tar_shape[[i]] <- build_s(m.space[target[i],], fou.pars = F, npts = npts)
+			tar_shape[[i]] <- build_s(unlist(m.space[target[i],]), fou.pars = F, npts = npts)
 		}
 	} else {
 		stop("No valid method provided")
