@@ -39,6 +39,7 @@
 #' 
 #' @return
 #' A list containing simulated shapes (and optionally parameters and distance metrics) for each iteration.
+
 simumorph <- function(x, m.space, init, init.from.morphospace = T, target, target.from.morphospace = T, method = c("AtoA","AtoB","AtoMult","Free"), sim, npts, a = 0.2, e = 0.15, dynamic_e = F, f = 100, int.allowed = F, only.shapes = F, max.attempts = 500){
 
 	## Define starting shape
@@ -356,19 +357,35 @@ simumorph <- function(x, m.space, init, init.from.morphospace = T, target, targe
 		names(simuls) <- paste0("Shape_t_",seq(1:length(simuls)))
 		return(simuls)
 	} else {
-		names(simuls) <- paste0("Shape_t_",seq(1:length(simuls)))
-		names(par_sim) <- paste0("Shape_t_",seq(1:length(par_sim)))
-		res <- list("Shapes" = simuls,
-			    "Xamplitudes" = Axmat,
-			    "Yamplitudes" = Aymat,
-			    "Xphases" = Phixmat,
-			    "Yphases" = Phiymat,
-			    "P.distances" = proc_distances,
-			    "F.parameters" = par_sim)
+		if (method == "AtoMult"){
+			names(simuls) <- paste0("Shape_t_",seq(1:length(simuls)))
+			names(par_sim) <- paste0("Shape_t_",seq(1:length(par_sim)))
+			res <- list("Shapes" = simuls,
+				    "Xamplitudes" = Axmat,
+			    	    "Yamplitudes" = Aymat,
+			            "Xphases" = Phixmat,
+			            "Yphases" = Phiymat,
+			            "P.distances" = proc_distances_mult,
+			            "F.parameters" = par_sim)
 
 		return(res)
+		} else {
+			names(simuls) <- paste0("Shape_t_",seq(1:length(simuls)))
+			names(par_sim) <- paste0("Shape_t_",seq(1:length(par_sim)))
+			res <- list("Shapes" = simuls,
+				    "Xamplitudes" = Axmat,
+			    	    "Yamplitudes" = Aymat,
+			            "Xphases" = Phixmat,
+			            "Yphases" = Phiymat,
+			            "P.distances" = proc_distances,
+			            "F.parameters" = par_sim)
+
+		return(res)
+		}
 	}
 }
+
+
 
 ####### Check that it works
 
