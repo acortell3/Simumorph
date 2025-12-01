@@ -210,7 +210,7 @@ simumorph <- function(x, m.space, init, init.from.morphospace = T, target, targe
 						Aymat[,index] <- amplitudes[(1:length(amplitudes)) %% 2 == 0]
 						Phixmat[,index] <- phases[(1:length(phases)) %% 2 == 1]
 						Phiymat[,index] <- phases[(1:length(phases)) %% 2 == 0]
-						proc_distances_mult[,index] <- pdist
+						proc_distances_mult[index] <- pdist
 						par_sim[[index]] <- cand_shape[[1]]
 						i_shape <- cand_vals
 			
