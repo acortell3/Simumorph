@@ -17,13 +17,14 @@
 
 valid_morphospace <- function(x,k,rnd,plotvalues = T){
 
+	pb <- txtProgressBar(min = 0, max = rnd, style = 3)
 	if (k == 1){
 		stop("k must be higher than 1")
 	}
 	
 	## Actual function
 	vars <- ncol(cov(x))
-	target <- mat[sample(1:nrow(x),vars),]
+	target <- x[sample(1:nrow(x),vars),]
 	cov_target <- cov(target)
 	eigen_target <- eigen(cov_target)$vectors[,1:k]
 	
@@ -50,6 +51,7 @@ valid_morphospace <- function(x,k,rnd,plotvalues = T){
 			eigen_vals_prov[i-27,k+3] <- i
 		}
 		eigen_vals <- rbind(eigen_vals,eigen_vals_prov)
+		setTxtProgressBar(pb, h)
 	}
 	
 	if (isTRUE(plotvalues)){
@@ -64,7 +66,7 @@ valid_morphospace <- function(x,k,rnd,plotvalues = T){
 		}
 		plot(x = eigen_vals$Obs, y = eigen_vals$eVector, pch = 16, col = adjustcolor("hotpink3", alpha.f = 0.2), xlab = "n samples", ylab = "value", main = paste0("Eigenvector dot product (k = ",k,")"))
 		plot(x = eigen_vals$Obs, y = eigen_vals$eValuemin, col = adjustcolor("olivedrab4", alpha.f = 0.2), xlab = "n samples", ylab = "value", pch = 16, main = "Minimum eigenvalue")
-		polygon(x = c(0,0,nrow(mat)+50,nrow(mat)+50), y = c(-0.05,1e-6,1e-6,-0.05), col = adjustcolor("pink",alpha.f=0.2), border = "red", lty =2)
+		polygon(x = c(0,0,nrow(x)+50,nrow(x)+50), y = c(-0.05,1e-6,1e-6,-0.05), col = adjustcolor("pink",alpha.f=0.2), border = "red", lty =2)
 		for (i in 1:k){
 			plot(x = eigen_vals$Obs, y = eigen_vals[,i+1], pch = 16, col = adjustcolor("lightseagreen", alpha.f = 0.2), xlab = "n samples", ylab = "value", main = paste0("eigenvalue",i))
 		}
@@ -72,7 +74,7 @@ valid_morphospace <- function(x,k,rnd,plotvalues = T){
 		par(mfrow = c(1,2))
 		plot(x = eigen_vals$Obs, y = eigen_vals$eVector, pch = 16, col = adjustcolor("hotpink3", alpha.f = 0.2), xlab = "n samples", ylab = "value", main = paste0("Eigenvector dot product (k = ",k,")"))
 		plot(x = eigen_vals$Obs, y = eigen_vals$eValuemin, col = adjustcolor("olivedrab4", alpha.f = 0.2), xlab = "n samples", ylab = "value", pch = 16, main = "Minimum eigenvalue")
-		polygon(x = c(0,0,nrow(mat)+50,nrow(mat)+50), y = c(-0.05,1e-6,1e-6,-0.05), col = adjustcolor("pink",alpha.f=0.2), border = "red", lty =2)
+		polygon(x = c(0,0,nrow(x)+50,nrow(x)+50), y = c(-0.05,1e-6,1e-6,-0.05), col = adjustcolor("pink",alpha.f=0.2), border = "red", lty =2)
 	}
 }
 	
