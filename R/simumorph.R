@@ -43,9 +43,6 @@
 
 simumorph <- function(x, m.space, init, init.from.morphospace = T, target, target.from.morphospace = T, method = c("AtoA","AtoB","AtoMult","Free"), sim, npts, a = 0.2, e = 0.15, dynamic_e = F, f = 100, int.allowed = F, only.shapes = F, max.attempts = 500, speedAtoB = 0){
 
-	if ((e+speedAtoB)<=0){
-		stop("e + speedAtoB must be higher than 0")
-	}
 	## Define starting shape
 	i_shape <- m.space[init,]
 
@@ -58,6 +55,9 @@ simumorph <- function(x, m.space, init, init.from.morphospace = T, target, targe
 	} else if (method == "AtoB"){
 		tar_vals <- m.space[target,]
 		tar_shape <- build_s(unlist(m.space[target,]), fou.pars = F, npts = npts)
+		if ((e+speedAtoB)<=0){
+			stop("e + speedAtoB must be higher than 0")
+		}
 	} else if (method == "AtoMult"){
 		tar_shape <- list()
 		for (i in 1:length(target)){
