@@ -32,6 +32,7 @@
 #' @param int.allowed Logical. Whether to allow line intersections in candidate shapes. Default is \code{FALSE}.
 #' @param only.shapes Logical. If \code{TRUE}, returns only simulated shapes at each time step. If \code{FALSE}, returns detailed info including parameters and distances. Default is \code{FALSE}.
 #' @param max.attempts Integer. Maximum attempts allowed without success in meeting \code{e} threshold before simulation stops. Default is 500.
+#' @param speedAtoB Numeric. When \code{method = "AtoB"} this quantity is added to last computed distance to control the speed of the process. It can be negative, but, if negative, \code{e} + \code{speedAtoB} must be larger than 0. Default is 0.
 #' 
 #' @import sf
 #' @importFrom tmvtnorm rtmvnorm
@@ -40,8 +41,11 @@
 #' @return
 #' A list containing simulated shapes (and optionally parameters and distance metrics) for each iteration.
 
-simumorph <- function(x, m.space, init, init.from.morphospace = T, target, target.from.morphospace = T, method = c("AtoA","AtoB","AtoMult","Free"), sim, npts, a = 0.2, e = 0.15, dynamic_e = F, f = 100, int.allowed = F, only.shapes = F, max.attempts = 500){
+simumorph <- function(x, m.space, init, init.from.morphospace = T, target, target.from.morphospace = T, method = c("AtoA","AtoB","AtoMult","Free"), sim, npts, a = 0.2, e = 0.15, dynamic_e = F, f = 100, int.allowed = F, only.shapes = F, max.attempts = 500, speedAtoB = 0){
 
+	if ((e+speedAtoB)<=0){
+		stop("e + speedAtoB must be higher than 0")
+	}
 	## Define starting shape
 	i_shape <- m.space[init,]
 
@@ -168,7 +172,7 @@ simumorph <- function(x, m.space, init, init.from.morphospace = T, target, targe
 						}
 					}
 				} else if (method == "AtoB"){
-					old_e <- e
+					old_e <- e+speedAtoB
 					## e procrustes distance 
 					pdist <- proc_dist(cand_shape[[2]],tar_shape,multi = F) 
 					
@@ -275,7 +279,7 @@ simumorph <- function(x, m.space, init, init.from.morphospace = T, target, targe
 					}
 				}
 			} else if (method == "AtoB"){
-				old_e <- e
+				old_e <- e+speedAtoB
 				## e procrustes distance 
 				pdist <- proc_dist(cand_shape[[2]],tar_shape,multi = F) 
 				

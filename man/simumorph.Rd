@@ -20,7 +20,8 @@ simumorph(
   f = 100,
   int.allowed = F,
   only.shapes = F,
-  max.attempts = 500
+  max.attempts = 500,
+  speedAtoB = 0
 )
 }
 \arguments{
@@ -61,6 +62,8 @@ simumorph(
 \item{only.shapes}{Logical. If \code{TRUE}, returns only simulated shapes at each time step. If \code{FALSE}, returns detailed info including parameters and distances. Default is \code{FALSE}.}
 
 \item{max.attempts}{Integer. Maximum attempts allowed without success in meeting \code{e} threshold before simulation stops. Default is 500.}
+
+\item{speedAtoB}{Numeric. When \code{method = "AtoB"} this quantity is added to last computed distance to control the speed of the process. It can be negative, but, if negative, \code{e} + \code{speedAtoB} must be larger than 0. Default is 0.}
 }
 \value{
 A list containing simulated shapes (and optionally parameters and distance metrics) for each iteration.
