@@ -24,6 +24,7 @@ format:
     self-contained: true
     toc-depth: 3
     number-sections: true
+    html-math-method: mathjax
 bibliography: references.bib
 csl: apa.csl
 editor: visual
