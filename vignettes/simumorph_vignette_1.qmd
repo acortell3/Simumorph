@@ -1,7 +1,4 @@
-%%
-%\VignetteIndexEntry{simumorph_vignette_1}
-%\VignetteEngine{quarto::html}
-%\VignetteEncoding{UTF-8}
+
 ---
 title: |
   Fundamentals and workflow for the R package Simumorph
@@ -11,6 +8,7 @@ title: |
     <div style ="margin-top: 2px;">
     <small><sup>1</sup> Department of Human Behavior, Ecology and Culture, Max Planck Institute for Evolutionary Anthropology, Leipzig, Germany</small>
   </span>
+vignette: true
 format:
   html:
     toc: true
@@ -19,10 +17,16 @@ format:
     crossref: true
     self-contained: true
     toc-depth: 3
+    number-sections: true
 bibliography: references.bib
 csl: apa.csl
 editor: visual
 ---
+<!-- %% -->
+<!-- %\VignetteIndexEntry{simumorph_vignette_1} -->
+<!-- %\VignetteEngine{quarto::html} -->
+<!-- %\VignetteEncoding{UTF-8} -->
+
 # Introduction {#sec-int}
 
 The following document goes through the theoretical fundamentals on how to develop a discrete morphometric simulation of cultural artefacts (for the example, geometric microliths), and offers a reproducible workflow using the `Rpackage Simumorph`. This vignette will cover everything in detail, but very briefly here, the idea is to reproduce the variation from a shape A to a shape B across a $t$ number of discrete steps. To ensure the consistency among the shapes, we use a morphospace (a set of shapes provided by the user, ideally from observed data), from which we extract a covariance matrix that is used for multivariate sampling of new shapes. Using this covariance matrix to propose new shapes ensures that the structural relationships of the parameters of such shapes are consistent with the ones within the 'observed' data.
