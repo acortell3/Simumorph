@@ -11,7 +11,10 @@ author:
 affiliations:
   - id: dhbec
     name: Department of Human Behavior, Ecology and Culture. Max Planck Institute for Evolutionary Anthropology, Leipzig, Germany
-vignette: true
+vignette: >
+  %\VignetteIndexEntry{simumorph_vignette_1}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
 format:
   html:
     toc: true
@@ -25,10 +28,6 @@ bibliography: references.bib
 csl: apa.csl
 editor: visual
 ---
-<!-- %% -->
-<!-- %\VignetteIndexEntry{simumorph_vignette_1} -->
-<!-- %\VignetteEngine{quarto::html} -->
-<!-- %\VignetteEncoding{UTF-8} -->
 
 # Introduction {#sec-int}
 
