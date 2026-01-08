@@ -6,8 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Alfredo Cortell-Nicolau">
+<meta name="author" content="Anne Kandler">
 
-<title>quarto-input196a658a32ac4496</title>
+<title>Fundamentals and workflow for the R package Simumorph</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -2338,17 +2340,35 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Fundamentals and workflow for the R package Simumorph <br> <span style="font-size:0.4em; font-weight:normal; font-style:italic;"> Alfredo Cortell-Nicolau<sup>1</sup> &amp; Anne Kandler<sup>1</sup>
-<div style="margin-top: 2px;">
-<p><small><sup>1</sup> Department of Human Behavior, Ecology and Culture, Max Planck Institute for Evolutionary Anthropology, Leipzig, Germany</small> </p>
-</div></span></h1>
+<h1 class="title">Fundamentals and workflow for the R package Simumorph</h1>
 </div>
 
 
+<div class="quarto-title-meta-author">
+  <div class="quarto-title-meta-heading">Authors</div>
+  <div class="quarto-title-meta-heading">Affiliation</div>
+  
+    <div class="quarto-title-meta-contents">
+    <p class="author">Alfredo Cortell-Nicolau </p>
+  </div>
+  <div class="quarto-title-meta-contents">
+        <p class="affiliation">
+            Department of Human Behavior, Ecology and Culture. Max Planck Institute for Evolutionary Anthropology, Leipzig, Germany
+          </p>
+      </div>
+    <div class="quarto-title-meta-contents">
+    <p class="author">Anne Kandler </p>
+  </div>
+  <div class="quarto-title-meta-contents">
+        <p class="affiliation">
+            Department of Human Behavior, Ecology and Culture. Max Planck Institute for Evolutionary Anthropology, Leipzig, Germany
+          </p>
+      </div>
+  </div>
 
 <div class="quarto-title-meta">
 
-    
+      
   
     
   </div>
@@ -2361,37 +2381,35 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#sec-int" id="toc-sec-int">Introduction</a></li>
-  <li><a href="#sec-theo" id="toc-sec-theo">General theoretical approach</a>
+  <li><a href="#sec-int" id="toc-sec-int"><span class="header-section-number">1</span> Introduction</a></li>
+  <li><a href="#sec-theo" id="toc-sec-theo"><span class="header-section-number">2</span> General theoretical approach</a>
   <ul>
-  <li><a href="#sec-GMMout" id="toc-sec-GMMout">GMM (outline-based) fundamentals</a>
+  <li><a href="#sec-GMMout" id="toc-sec-GMMout"><span class="header-section-number">2.1</span> GMM (outline-based) fundamentals</a>
   <ul>
-  <li><a href="#harmonics" id="toc-harmonics">Harmonics</a></li>
-  <li><a href="#small-recap" id="toc-small-recap">Small recap</a></li>
+  <li><a href="#harmonics" id="toc-harmonics"><span class="header-section-number">2.1.1</span> Harmonics</a></li>
+  <li><a href="#small-recap" id="toc-small-recap"><span class="header-section-number">2.1.2</span> Small recap</a></li>
   </ul></li>
   </ul></li>
-  <li><a href="#toolbox" id="toc-toolbox">Toolbox</a>
+  <li><a href="#toolbox" id="toc-toolbox"><span class="header-section-number">3</span> Toolbox</a>
   <ul>
-  <li><a href="#sec-morphospace" id="toc-sec-morphospace">The Morphospace</a></li>
-  <li><a href="#shape-variation" id="toc-shape-variation">Shape variation</a>
+  <li><a href="#sec-morphospace" id="toc-sec-morphospace"><span class="header-section-number">3.1</span> The Morphospace</a></li>
+  <li><a href="#shape-variation" id="toc-shape-variation"><span class="header-section-number">3.2</span> Shape variation</a>
   <ul>
-  <li><a href="#sec-covmat" id="toc-sec-covmat">Covariance matrix</a></li>
-  <li><a href="#sec-pars" id="toc-sec-pars">Parameters</a></li>
-  <li><a href="#sec-rest" id="toc-sec-rest">Restrictions</a></li>
+  <li><a href="#sec-covmat" id="toc-sec-covmat"><span class="header-section-number">3.2.1</span> Covariance matrix</a></li>
+  <li><a href="#sec-pars" id="toc-sec-pars"><span class="header-section-number">3.2.2</span> Parameters</a></li>
+  <li><a href="#sec-rest" id="toc-sec-rest"><span class="header-section-number">3.2.3</span> Restrictions</a></li>
   </ul></li>
-  <li><a href="#sec-targ" id="toc-sec-targ">Targets</a></li>
+  <li><a href="#sec-targ" id="toc-sec-targ"><span class="header-section-number">3.3</span> Targets</a></li>
   </ul></li>
-  <li><a href="#sec-mod" id="toc-sec-mod">Model and simulation</a></li>
-  <li><a href="#simumorph" id="toc-simumorph">Simumorph</a>
-  <ul>
-  <li><a href="#references" id="toc-references">References</a></li>
-  </ul></li>
+  <li><a href="#sec-mod" id="toc-sec-mod"><span class="header-section-number">4</span> Model and simulation</a></li>
+  <li><a href="#simumorph" id="toc-simumorph"><span class="header-section-number">5</span> Simumorph</a></li>
+  <li><a href="#references" id="toc-references"><span class="header-section-number">6</span> References</a></li>
   </ul>
 </nav>
-<section id="sec-int" class="level1">
-<h1>Introduction</h1>
+<section id="sec-int" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Introduction</h1>
 <p>The following document goes through the theoretical fundamentals on how to develop a discrete morphometric simulation of cultural artefacts (for the example, geometric microliths), and offers a reproducible workflow using the <code>Rpackage Simumorph</code>. This vignette will cover everything in detail, but very briefly here, the idea is to reproduce the variation from a shape A to a shape B across a <span class="math inline">\(t\)</span> number of discrete steps. To ensure the consistency among the shapes, we use a morphospace (a set of shapes provided by the user, ideally from observed data), from which we extract a covariance matrix that is used for multivariate sampling of new shapes. Using this covariance matrix to propose new shapes ensures that the structural relationships of the parameters of such shapes are consistent with the ones within the ‘observed’ data.</p>
-<p>There are several elements that have to be considered to deploy the full simulation, and they are significantly interrelated. We have decided to explain each of these elements one by one, with several references to one another throughout the text, although the reader will probably have to bear with us while we go through each element until getting the full picture at the end. For the reader to understand what to expect on section, a brief outline would be as follows:</p>
+<p>There are several elements that have to be considered to deploy the full simulation, and they are significantly interrelated. We have decided to explain each of these elements one by one, with several references to one another throughout the text, although the reader will probably have to bear with us while we go through each element until getting the full picture at the end. For the reader to understand what to expect on each section, a brief outline would be as follows:</p>
 <ol type="1">
 <li><em>General theoretical approach</em>. Here we offer a brief theoretical overview of how outline-based Geometric Morphometrics (GMM) works. We also explain in some detail what a harmonic is and how its mathematical properties define it, since we will need those properties for the simulation.</li>
 <li><em>Toolbox</em>. Only using a covariance matrix might not be enough to ensure a consistent simulation, while staying within morphometrically plausible shapes. In this section we go through the different elements that we have used to deploy a realistic simulation.</li>
@@ -2400,17 +2418,17 @@ window.Quarto = {
 </ol>
 <p>From the four sections above, the first three offer the theory and the individual code necessary to run the processes, whilst the fourth section offers the compiled workflow using <code>Simumorph</code>. The reader can decide how to use this vignette, either just the theory, individual code, theory and package together or just dive directly into the package going to section 4. The code during sections 1, 2 and 3 build on each other, while the code in section 4 can be run independently.</p>
 </section>
-<section id="sec-theo" class="level1">
-<h1>General theoretical approach</h1>
-<p>Geometric Morphometrics (GMM) is an approach developed in the field of Ecology, whose main objective is to measure and compare natural shapes <span class="citation" data-cites="bookstein_foundations_1982 rohlf_comparison_1984 claude_morphometrics_2008">(<a href="#ref-bookstein_foundations_1982" role="doc-biblioref">Bookstein, 1982</a>; <a href="#ref-claude_morphometrics_2008" role="doc-biblioref">Claude, 2008</a>; <a href="#ref-rohlf_comparison_1984" role="doc-biblioref">Rohlf &amp; Archie, 1984</a>)</span>. Here we focus on the technical details of how we use it in order to develop a diachronic simulation, or drift, of the morphometry of cultural artifacts, in our case, prehistoric arrowheads, or geometric microliths.</p>
+<section id="sec-theo" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> General theoretical approach</h1>
+<p>Geometric Morphometrics (GMM) is an approach developed in the field of Ecology, whose main objective is to measure and compare natural shapes <span class="citation" data-cites="bookstein_foundations_1982 rohlf_comparison_1984 claude_morphometrics_2008">(<a href="#ref-bookstein_foundations_1982" role="doc-biblioref">Bookstein, 1982</a>; <a href="#ref-claude_morphometrics_2008" role="doc-biblioref">Claude, 2008</a>; <a href="#ref-rohlf_comparison_1984" role="doc-biblioref">Rohlf &amp; Archie, 1984</a>)</span>. Here we focus on the technical details of how we use it in order to develop a diachronic simulation, or drift, of the morphometry of cultural artifacts. In our case, prehistoric arrowheads, or geometric microliths.</p>
 <p>Our objective is to obtain shapes that undergo small but consistent variation for each step <span class="math inline">\(t\)</span> of the simulation. These shapes must meet the following conditions:</p>
 <ol type="1">
 <li>They must be functionally realistic (e.g. cannot contain line inter-crossings or wiggles)</li>
 <li>Shape at <span class="math inline">\(t\)</span> depends on shape at <span class="math inline">\(t-1\)</span></li>
 <li>Shape at <span class="math inline">\(t\)</span> must vary only slightly from shape at <span class="math inline">\(t-1\)</span></li>
 </ol>
-<section id="sec-GMMout" class="level2">
-<h2 class="anchored" data-anchor-id="sec-GMMout">GMM (outline-based) fundamentals</h2>
+<section id="sec-GMMout" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="sec-GMMout"><span class="header-section-number">2.1</span> GMM (outline-based) fundamentals</h2>
 <p>To do this, we use outline-based geometric morphometrics, relying on Elliptic Fourier Decomposition <span class="citation" data-cites="claude_morphometrics_2008 kuhl_elliptic_1982">(<a href="#ref-claude_morphometrics_2008" role="doc-biblioref">Claude, 2008</a>; <a href="#ref-kuhl_elliptic_1982" role="doc-biblioref">Kuhl &amp; Giardina, 1982</a>)</span>. Essentially, the general expression of the Fourier expansion for a periodic function <span class="math inline">\(f(t)\)</span> with <span class="math inline">\(t \in \mathbb{R}\)</span>, of period <span class="math inline">\(T\)</span> and with <span class="math inline">\(n\)</span> number of harmonics, is defined as</p>
 <p><span id="eq-fou"><span class="math display">\[f(t) = \frac{1}{2}a_0 + \sum_{n=1}^{\infty}[a_n \cos(\omega_n t)+b_n \sin(\omega_n t)], \tag{1}\]</span></span></p>
 <p>where</p>
@@ -2420,32 +2438,32 @@ window.Quarto = {
 <p>are the even Fourier coefficients, and</p>
 <p><span id="eq-bn"><span class="math display">\[b_n = \frac{2}{T}\int_{t_1}^{t_2}f(t)\sin(\omega_n t) dt \tag{4}\]</span></span></p>
 <p>are the odd Fourier coefficients.</p>
-<p>These Fourier transforms, however, cannot be applied directly on outline analysis, since they are defined as a function of x and y-coordinates in two dimensions. Thus, the most common adopted solution is to use elliptic Fourier decomposition, by which the x and y coordinates are decomposed and expressed as functions of the curvilinear abscissa. Under this approach, we can apply the Fourier equation for each coordinate, as follows:</p>
-<p><span id="eq-x"><span class="math display">\[x(t) = \frac{a_0}{2}+\sum_{n=1}^{+\infty}a_n \cos n \omega t + b_n \sin n \omega t \tag{5}\]</span></span></p>
+<p>These Fourier transforms, however, cannot be applied directly on outline analysis, since an outline is defined as a function of x and y-coordinates in two dimensions. Thus, the most common adopted solution is to use elliptic Fourier decomposition, by which the x and y coordinates are decomposed and expressed as functions of the curvilinear abscissa. In this framework the period <span class="math inline">\(T\)</span> is taken to be the outline perimeter. If we set the fundamental angular frequency <span class="math inline">\(\omega = \frac{2\pi}{T}\)</span>, and let the curvilinear abscissa <span class="math inline">\(t\)</span> run from <span class="math inline">\(0\)</span> to <span class="math inline">\(T\)</span>, then <span class="math inline">\(x(t)\)</span> and (y(t)$ can be expressed as follows:</p>
+<p><span id="eq-x"><span class="math display">\[x(t) = \frac{a_0}{2}+\sum_{j=1}^{+\infty}a_j \cos j \omega t + b_j \sin j \omega t \tag{5}\]</span></span></p>
 <p>and</p>
-<p><span id="eq-y"><span class="math display">\[y(t) = \frac{c_0}{2}+\sum_{n=1}^{+\infty}c_n \cos n \omega t + d_n \sin n \omega t. \tag{6}\]</span></span></p>
+<p><span id="eq-y"><span class="math display">\[y(t) = \frac{c_0}{2}+\sum_{j=1}^{+\infty}c_j \cos j \omega t + d_j \sin j \omega t. \tag{6}\]</span></span></p>
 <p>Here, and considering an outline with <span class="math inline">\(k\)</span> finite number of points, we can calculate discrete estimators for the different parameters as:</p>
-<p><span id="eq-dia"><span class="math display">\[a_n = \frac{T}{2\pi^2n^2}\sum_{p=1}^{k}\frac{\Delta x_p}{\Delta t_p}\left(\cos\frac{2\pi n t_p}{T}-\cos\frac{2\pi nt_{p-1}}{T}\right) \tag{7}\]</span></span></p>
+<p><span id="eq-dia"><span class="math display">\[a_j = \frac{T}{2\pi^2j^2}\sum_{p=1}^{k}\frac{\Delta x_p}{\Delta t_p}\left(\cos\frac{2\pi j t_p}{T}-\cos\frac{2\pi jt_{p-1}}{T}\right) \tag{7}\]</span></span></p>
 <p>with</p>
 <p><span class="math display">\[\Delta x_1 = x_1-x_k\]</span></p>
 <p>and</p>
-<p><span id="eq-dib"><span class="math display">\[b_n = \frac{T}{2\pi^2n^2}\sum_{p=1}^{k}\frac{\Delta x_p}{\Delta t_p}\left(\sin\frac{2\pi n t_p}{T}-\sin\frac{2\pi nt_{p-1}}{T}\right) \tag{8}\]</span></span></p>
-<p>with <span class="math inline">\(c_n\)</span> and <span class="math inline">\(d_n\)</span> calculated similarly for the <span class="math inline">\(y\)</span> coordinates. Because <span class="math inline">\(a_0\)</span> and <span class="math inline">\(c_0\)</span> are used for centering, these will not be explicitly modelled and, thus, our base equation becomes</p>
-<p><span id="eq-ba"><span class="math display">\[x(t) = \sum_{n=1}^{+\infty}a_n \cos n \omega t + b_n \sin n \omega t \tag{9}\]</span></span></p>
+<p><span id="eq-dib"><span class="math display">\[b_j = \frac{T}{2\pi^2j^2}\sum_{p=1}^{k}\frac{\Delta x_p}{\Delta t_p}\left(\sin\frac{2\pi j t_p}{T}-\sin\frac{2\pi jt_{p-1}}{T}\right) \tag{8}\]</span></span></p>
+<p>with <span class="math inline">\(c_j\)</span> and <span class="math inline">\(d_j\)</span> calculated similarly for the <span class="math inline">\(y\)</span> coordinates. Because <span class="math inline">\(a_0\)</span> and <span class="math inline">\(c_0\)</span> are used for centering, these will not be explicitly modelled and, thus, our base equation becomes</p>
+<p><span id="eq-ba"><span class="math display">\[x(t) = \sum_{j=1}^{+\infty}a_j \cos j \omega t + b_j \sin j \omega t \tag{9}\]</span></span></p>
 <p>and similarly for <span class="math inline">\(y(t)\)</span>.</p>
-<p>Conceptually, it might be difficult to understand how periodic functions (e.g. sine waves) can produce sharp conrners, or angular features. The short answer to this is that they do not, but because the resolution of the representation increases as we add harmonics, with enough number of harmonics we can always obtain (or having the illusion to obtain) a specific angle, as pointed as it might be. If we were able to increase the size of our visualisation <em>ad infinitum</em> at some point we would see a rounded curve, but this would be of no visual nor analytical consequence if <span class="math inline">\(n\)</span> is high enough.</p>
-<section id="harmonics" class="level3">
-<h3 class="anchored" data-anchor-id="harmonics">Harmonics</h3>
+<p>Conceptually, it might be difficult to understand how periodic functions (e.g. sine waves) can produce sharp corners, or angular features. The short answer to this is that they cannot, but because the resolution of the representation increases as we add harmonics, with enough number of harmonics we can always obtain (or having the illusion to obtain) a specific angle, as pointed as it might be. If we were able to increase the size of our visualisation <em>ad infinitum</em> at some point we would see a rounded curve, but this would be of no visual nor analytical consequence if <span class="math inline">\(j\)</span> is high enough.</p>
+<section id="harmonics" class="level3" data-number="2.1.1">
+<h3 data-number="2.1.1" class="anchored" data-anchor-id="harmonics"><span class="header-section-number">2.1.1</span> Harmonics</h3>
 <p>Fourier series were developed originally to work with so-called harmonics and harmonic ranges, and have known a significant development on different fields such as music, signal processing, electrical engineering and, of course, ecology and cultural studies. Understanding how harmonics work is crucial to understand how these are adapted in the context of outline-based geometric morphometrics. A harmonic can be defined as a sinusoidal wave with frequency multiple of a so-called fundamental frequency of a periodic signal (the 1st harmmonic). This implies that the way in which we structure the harmonics, as per <a href="#eq-fou" class="quarto-xref">Equation 1</a>, and of course <a href="#eq-x" class="quarto-xref">Equation 5</a> and <a href="#eq-y" class="quarto-xref">Equation 6</a>, is hierarchical. In other words, lower order harmonics have wider sinusoidal shapes, and model coarser morphometric features, whereas higher order harmonics have less impact on the general shape, but are the ones modelling finer grain details. As we will see, this has implications in how we develop a simulation, since these hierarchies must be respected through their parameter ranges if we want to obtain <em>credible</em> shapes consistently.</p>
 <p>Each harmonic is governed by three mathematical properties: frequency (<span class="math inline">\(f\)</span>), amplitude (<span class="math inline">\(A\)</span>) and phase (<span class="math inline">\(\phi\)</span>), which together define a sine wave according to:</p>
 <p><span id="eq-sine"><span class="math display">\[S(t) = A \cos(\omega_t - \phi), \tag{10}\]</span></span></p>
 <p>where <span class="math inline">\(\omega = 2\pi f\)</span> is the angular frequency, in radians, derived from the frequency <span class="math inline">\(f\)</span>.</p>
-<p>Now, we can individually explore each of these properties, and how they relate to the Fourier parameters (<span class="math inline">\(a_n\)</span>, <span class="math inline">\(b_n\)</span>, <span class="math inline">\(c_n\)</span> and <span class="math inline">\(d_n\)</span>), as follows:</p>
-<section id="angular-frequency" class="level4">
-<h4 class="anchored" data-anchor-id="angular-frequency">(Angular) frequency</h4>
+<p>Now, we can individually explore each of these properties, and how they relate to <span class="math inline">\(a_j\)</span>, <span class="math inline">\(b_j\)</span>, <span class="math inline">\(c_j\)</span> and <span class="math inline">\(d_j\)</span>, from now on, indistinctly referred to as Fourier parameters, as follows:</p>
+<section id="angular-frequency" class="level4" data-number="2.1.1.1">
+<h4 data-number="2.1.1.1" class="anchored" data-anchor-id="angular-frequency"><span class="header-section-number">2.1.1.1</span> (Angular) frequency</h4>
 <p>Frequency, as we have seen above, represents the number of cycles per second and is the reciprocal of the period <span class="math inline">\(T\)</span>:</p>
 <p><span class="math display">\[f = \frac{1}{T}.\]</span></p>
-<p>From here, given the angular frequency <span class="math inline">\(\omega = 2\pi f\)</span>, we can easily derive the value of angular frequency per <span class="math inline">\(n_{th}\)</span> hamonic (<span class="math inline">\(\omega_n\)</span>) given in <a href="#eq-fre" class="quarto-xref">Equation 2</a>. We can understand frequency as a parameter that governs the resolution of the sinewave, and because it is determined by <span class="math inline">\(n\)</span>, it stays the same for any shape given equal <span class="math inline">\(n\)</span> and <span class="math inline">\(T\)</span>. Thus, frequency will not be modelled, since it is deterministically defined by the number of harmonics, and its role within this framework is only to specify the resolution of each harmonic. An example of how frequency works can be seen below.</p>
+<p>From here, given the angular frequency <span class="math inline">\(\omega = 2\pi f\)</span>, we can easily derive the value of angular frequency per <span class="math inline">\(j_{th}\)</span> hamonic (<span class="math inline">\(\omega_j\)</span>) given in <a href="#eq-fre" class="quarto-xref">Equation 2</a>. We can understand frequency as a parameter that governs the resolution of the sinewave, and because it is determined by <span class="math inline">\(j\)</span>, it stays the same for any shape given equal <span class="math inline">\(j\)</span> and <span class="math inline">\(T\)</span>. Thus, frequency will not be modelled, since it is deterministically defined by the number of harmonics, and its role within this framework is only to specify the resolution of each harmonic. An example of how frequency works can be seen below.</p>
 <div class="cell" data-fold="true">
 <details class="code-fold">
 <summary>Code</summary>
@@ -2487,32 +2505,32 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<p>For the definition of the harmonics, the Fourier series use the four parameters <span class="math inline">\(a_n\)</span>, <span class="math inline">\(b_n\)</span>, <span class="math inline">\(c_n\)</span> and <span class="math inline">\(d_n\)</span>. These parameters can be linked to amplitude (<span class="math inline">\(A\)</span>) and phase (<span class="math inline">\(\phi\)</span>).</p>
+<p>For the definition of the harmonics, the Fourier series use the four parameters <span class="math inline">\(a_j\)</span>, <span class="math inline">\(b_j\)</span>, <span class="math inline">\(c_j\)</span> and <span class="math inline">\(d_j\)</span>. These parameters can be linked to amplitude (<span class="math inline">\(A\)</span>) and phase (<span class="math inline">\(\phi\)</span>).</p>
 </section>
-<section id="sec-amp" class="level4">
-<h4 class="anchored" data-anchor-id="sec-amp">Amplitude</h4>
-<p>We can understand amplitude as the width, or range of our sinewave. In other words the difference between the maximum and minimum points on the y axis in our sinewave. Although it is not parameterised in <a href="#eq-x" class="quarto-xref">Equation 5</a>, it can be derived from the parameters <span class="math inline">\(a_n\)</span> and <span class="math inline">\(b_n\)</span> (<span class="math inline">\(c_n\)</span> and <span class="math inline">\(d_n\)</span> for <a href="#eq-y" class="quarto-xref">Equation 6</a>) as follows:</p>
+<section id="sec-amp" class="level4" data-number="2.1.1.2">
+<h4 data-number="2.1.1.2" class="anchored" data-anchor-id="sec-amp"><span class="header-section-number">2.1.1.2</span> Amplitude</h4>
+<p>We can understand amplitude as the width, or range of our sinewave. In other words the difference between the maximum and minimum points on the y axis in our sinewave. Although it is not parameterised in <a href="#eq-x" class="quarto-xref">Equation 5</a>, it can be derived from the parameters <span class="math inline">\(a_j\)</span> and <span class="math inline">\(b_j\)</span> (<span class="math inline">\(c_j\)</span> and <span class="math inline">\(d_j\)</span> for <a href="#eq-y" class="quarto-xref">Equation 6</a>) as follows:</p>
 <p>From <a href="#eq-x" class="quarto-xref">Equation 5</a> we know that each harmonic is defined by:</p>
-<p><span class="math display">\[a_n\cos(n\omega t) + b_n\sin(n\omega t).\]</span></p>
+<p><span class="math display">\[a_j\cos(j\omega t) + b_j\sin(j\omega t).\]</span></p>
 <p>We start with the trigonometric identity</p>
 <p><span class="math display">\[\cos(\alpha - \beta) = \cos \alpha \cos \beta + \sin \alpha \sin \beta,\]</span></p>
 <p>which, if applied with <a href="#eq-sine" class="quarto-xref">Equation 10</a>, gives</p>
-<p><span class="math display">\[A_n\cos(n\omega t - \phi_n) = A_n \cos (n\omega t)  \cos (\phi_n) + A_n \sin (n\omega t) \sin (\phi_n).\]</span></p>
+<p><span class="math display">\[A_j\cos(j\omega t - \phi_j) = A_j \cos (j\omega t)  \cos (\phi_j) + A_j \sin (j\omega t) \sin (\phi_j).\]</span></p>
 <p>We can then extract the matching terms from</p>
-<p><span class="math display">\[a_n \cos(n\omega t) + b_n \sin (n\omega t) = A_n \cos (n\omega t)  \cos (\phi_n) + A_n \sin (n\omega t) \sin (\phi_n)\]</span></p>
+<p><span class="math display">\[a_j \cos(j\omega t) + b_j \sin (j\omega t) = A_j \cos (j\omega t)  \cos (\phi_j) + A_j \sin (j\omega t) \sin (\phi_j)\]</span></p>
 <p>to get</p>
-<p><span class="math display">\[a_n = A_n\cos(\phi_n) \ \textrm{and} \  b_n = A_n\sin(\phi_n).\]</span></p>
-<p>If we now want to compute <span class="math inline">\(A_n\)</span> for the parameters <span class="math inline">\(a_n\)</span> and <span class="math inline">\(b_n\)</span>, we can square both equations</p>
-<p><span class="math display">\[a_n^2 = A_n^2\cos^2(\phi_n)\]</span> <span class="math display">\[b_n^2 = A_n^2\sin^2(\phi_n)\]</span></p>
-<p>and add them <span class="math display">\[a_n^2+b_n^2=A_n^2\cos^2(\phi_n) + A_n^2\sin^2(\phi_n),\]</span></p>
+<p><span class="math display">\[a_j = A_j\cos(\phi_j) \ \textrm{and} \  b_j = A_j\sin(\phi_j).\]</span></p>
+<p>If we now want to compute <span class="math inline">\(A_j\)</span> for the parameters <span class="math inline">\(a_j\)</span> and <span class="math inline">\(b_j\)</span>, we can square both equations</p>
+<p><span class="math display">\[a_j^2 = A_j^2\cos^2(\phi_j)\]</span> <span class="math display">\[b_j^2 = A_j^2\sin^2(\phi_j)\]</span></p>
+<p>and add them <span class="math display">\[a_j^2+b_j^2=A_j^2\cos^2(\phi_j) + A_j^2\sin^2(\phi_j),\]</span></p>
 <p>or</p>
-<p><span class="math display">\[a_n^2+b_n^2 = A_n^2(\cos^2(\phi_n) + \sin^2(\phi_n)).\]</span></p>
+<p><span class="math display">\[a_j^2+b_j^2 = A_j^2(\cos^2(\phi_j) + \sin^2(\phi_j)).\]</span></p>
 <p>If we then use the Pythagorean identity</p>
-<p><span class="math display">\[\cos^2(\phi_n) + \sin^2(\phi_n) = 1,\]</span></p>
+<p><span class="math display">\[\cos^2(\phi_j) + \sin^2(\phi_j) = 1,\]</span></p>
 <p>it reduces to</p>
-<p><span class="math display">\[a_n^2+b_n^2 = A_n^2,\]</span></p>
+<p><span class="math display">\[a_j^2+b_j^2 = A_j^2,\]</span></p>
 <p>which finally gives us the amplitude as</p>
-<p><span id="eq-amp"><span class="math display">\[A_n = \sqrt{a_n^2+b_n^2}. \tag{11}\]</span></span></p>
+<p><span id="eq-amp"><span class="math display">\[A_j = \sqrt{a_j^2+b_j^2}. \tag{11}\]</span></span></p>
 <p>Below we show changes in amplitude, given that the rest of parameters remain equal.</p>
 <div class="cell" data-fold="true">
 <details class="code-fold">
@@ -2556,16 +2574,16 @@ window.Quarto = {
 </div>
 </div>
 </section>
-<section id="sec-pha" class="level4">
-<h4 class="anchored" data-anchor-id="sec-pha">Phase</h4>
+<section id="sec-pha" class="level4" data-number="2.1.1.3">
+<h4 data-number="2.1.1.3" class="anchored" data-anchor-id="sec-pha"><span class="header-section-number">2.1.1.3</span> Phase</h4>
 <p>In plain words, <span class="math inline">\(\phi\)</span> tells us where ‘the wave starts’. As with <span class="math inline">\(A\)</span>, it is not explicitly parameterised in <a href="#eq-x" class="quarto-xref">Equation 5</a> but, as with <span class="math inline">\(A\)</span>, it can be derived from it. If, from the derivation above, we consider</p>
-<p><span class="math display">\[\frac{b_n}{a_n}=\frac{A_n\sin(\phi_n)}{A_n\cos(\phi_n)},\]</span></p>
-<p>then, since <span class="math inline">\(A_n\)</span> cancels out, and with basic trigonometry</p>
-<p><span class="math display">\[\frac{b_n}{a_n}=\tan(\phi_n).\]</span></p>
-<p>Finally, solving for <span class="math inline">\(\phi_n\)</span>, we get</p>
-<p><span class="math display">\[\phi_n = \tan^-1\left(\frac{b_n}{a_n}\right),\]</span></p>
+<p><span class="math display">\[\frac{b_j}{a_j}=\frac{A_j\sin(\phi_j)}{A_j\cos(\phi_j)},\]</span></p>
+<p>then, with basic trigonometry</p>
+<p><span class="math display">\[\frac{b_j}{a_j}=\tan(\phi_j).\]</span></p>
+<p>Solving for <span class="math inline">\(\phi_j\)</span>, we get</p>
+<p><span class="math display">\[\phi_j = \tan^-1\left(\frac{b_j}{a_j}\right),\]</span></p>
 <p>or</p>
-<p><span id="eq-pha"><span class="math display">\[\phi_n = \arctan \left(\frac{b_n}{a_n}\right). \tag{12}\]</span></span></p>
+<p><span id="eq-pha"><span class="math display">\[\phi_j = \arctan \left(\frac{b_j}{a_j}\right). \tag{12}\]</span></span></p>
 <p>We can observe how different <span class="math inline">\(\phi\)</span> values change the starting point of the wave in the plots below.</p>
 <div class="cell" data-fold="true">
 <details class="code-fold">
@@ -2610,20 +2628,20 @@ window.Quarto = {
 </div>
 </section>
 </section>
-<section id="small-recap" class="level3">
-<h3 class="anchored" data-anchor-id="small-recap">Small recap</h3>
+<section id="small-recap" class="level3" data-number="2.1.2">
+<h3 data-number="2.1.2" class="anchored" data-anchor-id="small-recap"><span class="header-section-number">2.1.2</span> Small recap</h3>
 <p>From the above it might be seen that a specific shape (or shape feature), which emerges from the combination of <a href="#eq-x" class="quarto-xref">Equation 5</a> and <a href="#eq-y" class="quarto-xref">Equation 6</a> for the x and y axes respectively, cannot be associated with one specific parameter value for any harmonic. Rather, it is the interplay between <span class="math inline">\(\omega\)</span>, <span class="math inline">\(A\)</span> and <span class="math inline">\(\phi\)</span> which will finally result in one shape or another. This also means that these variables are not independent, and this must be taken into account to develop the simulation.</p>
 </section>
 </section>
 </section>
-<section id="toolbox" class="level1">
-<h1>Toolbox</h1>
+<section id="toolbox" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Toolbox</h1>
 <p>The objective of the simulation is to reproduce stochastic variation of specific shapes. It can be applied to any kind of artifact, but here we focus on geometric microliths, a specific type of prehistoric arrowhead used in many contexts and periods, but with special prevalence during the Early and Middle Holocene in Europe (see associated paper). Through previous work <span class="citation" data-cites="cortell-nicolau_cultural_2020 cortell-nicolau_geometric_2023">(<a href="#ref-cortell-nicolau_cultural_2020" role="doc-biblioref">Cortell-Nicolau et al., 2020</a>, <a href="#ref-cortell-nicolau_geometric_2023" role="doc-biblioref">2023</a>)</span>, we have estimated that the best compromise between shape resolution and computational efficiency is to use 7 harmonics. However, and depending on the selected shape (for example, pottery shapes or tanged and barbed points), the number of necessary harmonics might differ.</p>
 <p>Before we explicitly define the model and develop the simulation, there are several tools, resources, concepts and caveats that need to be discussed, as follows:</p>
-<section id="sec-morphospace" class="level2">
-<h2 class="anchored" data-anchor-id="sec-morphospace">The Morphospace</h2>
-<p>Attending to <a href="#sec-theo" class="quarto-xref">Section 2</a>, we have a total of four parameters per harmonic (<span class="math inline">\(a_n\)</span>, <span class="math inline">\(b_n\)</span>, <span class="math inline">\(c_n\)</span> and <span class="math inline">\(d_n\)</span>) which in our case, where <span class="math inline">\(N=7\)</span>, leaves us with a total of 28 parameters per shape. These parameters are not independent, and it is their interplay which will finally result in one or another shape. In this scenario, it is not feasible to compute which parameter values would be necessary for any desired shape. To solve this, we have decided to use the <strong>morphospace</strong> as the main tool of our simulation. We can define the morphospace as an assemblage of the shapes that we would expect to find in the archaeological record, either from a theoretical or an empirical perspective. Its objective is to estimate parameter values from these known shapes, which will conform the main numeric input for our simulation. As we will see in the sections below, these parameter values will be used in many ways, from estimating parameters (<a href="#sec-pars" class="quarto-xref">Section 3.2.2</a>) and restrictions (<a href="#sec-rest" class="quarto-xref">Section 3.2.3</a>) to establish target points (<a href="#sec-targ" class="quarto-xref">Section 3.3</a>) throughout the simulation or to produce the necessary covariance matrix (<a href="#sec-covmat" class="quarto-xref">Section 3.2.1</a>). The morphospace can be built from a set of known artifacts (e.g. artifacts that have been collected in the field and digitised). However, for the purpose of this simulation, we have decided to use well-known archaeological <em>types</em> as they were defined by Javier <span class="citation" data-cites="fortea_complejos_1973">Fortea (<a href="#ref-fortea_complejos_1973" role="doc-biblioref">1973</a>)</span> for the Iberian Mesolithic. Lengthier discussion on the problems of using archaeologically defined types can be found in the main manuscript, but we use them in this simulation for convenience because this allows us to address further problems, such as the effect of collinearity and small sample sizes on the covariance matrix, as we will see below.</p>
-<p>We have, essentially, the following 28 types, as they were originally defined. This is if we consider laterality as different types, and it is not how Fortea classified them, but is it relevant for our approach. There is a somehow more extended discussion on the definition of laterality in lithic types, and its combination with GMM in the associated paper. If we have black .jpg files of these images, we can estimate the parameter values for each of these shapes, as stated in <a href="#sec-GMMout" class="quarto-xref">Section 2.1</a>. We use the R package <code>Momocs</code> <span class="citation" data-cites="bonhomme_momocs:_2014">(<a href="#ref-bonhomme_momocs:_2014" role="doc-biblioref">Bonhomme et al., 2014</a>)</span> for this. The code below loads the different shapes of the morphospace, as well as produces some utilities and loads custom functions that will be needed further down the line. Our 28 original shapes would look as follows:</p>
+<section id="sec-morphospace" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="sec-morphospace"><span class="header-section-number">3.1</span> The Morphospace</h2>
+<p>Attending to <a href="#sec-theo" class="quarto-xref">Section 2</a>, we have a total of four parameters per harmonic (<span class="math inline">\(a_j\)</span>, <span class="math inline">\(b_j\)</span>, <span class="math inline">\(c_j\)</span> and <span class="math inline">\(d_j\)</span>) which in our case, leaves us with a total of 28 parameters per shape. These parameters are not independent, and it is their interplay which will finally result in one or another shape. In this scenario, it is not feasible to compute which parameter values would be necessary for any desired shape. To solve this, we have decided to use the <strong>morphospace</strong> as the main tool of our simulation. We can define the morphospace as an assemblage of the shapes that we would expect to find in the archaeological record, either from a theoretical or an empirical perspective. Its objective is to estimate parameter values from these known shapes, which will conform the main numeric input for our simulation. As we will see in the sections below, these parameter values will be used in many ways, from estimating parameters (<a href="#sec-pars" class="quarto-xref">Section 3.2.2</a>) and restrictions (<a href="#sec-rest" class="quarto-xref">Section 3.2.3</a>) to establish target points (<a href="#sec-targ" class="quarto-xref">Section 3.3</a>) throughout the simulation or to produce the necessary covariance matrix (<a href="#sec-covmat" class="quarto-xref">Section 3.2.1</a>). The morphospace can be built from a set of known artifacts (e.g. artifacts that have been collected in the field and digitised). However, for the purpose of this simulation, we have decided to use well-known archaeological <em>types</em> as they were defined by Javier <span class="citation" data-cites="fortea_complejos_1973">Fortea (<a href="#ref-fortea_complejos_1973" role="doc-biblioref">1973</a>)</span> for the Iberian Mesolithic. Lengthier discussion on the problems of using archaeologically defined types can be found in the main manuscript, but we use them in this simulation for convenience because this allows us to address further problems, such as the effect of collinearity and small sample sizes on the covariance matrix, as we will see below.</p>
+<p>We have, essentially, the following 28 types, as they were originally defined, and considering laterality as a marker for different types. If we have black .jpg files of these images, we can estimate the parameter values for each of these shapes, as stated in <a href="#sec-GMMout" class="quarto-xref">Section 2.1</a>. We use the R package <code>Momocs</code> <span class="citation" data-cites="bonhomme_momocs:_2014">(<a href="#ref-bonhomme_momocs:_2014" role="doc-biblioref">Bonhomme et al., 2014</a>)</span> for this. The code below loads the different shapes of the morphospace, as well as produces some utilities and loads custom functions that will be needed further down the line. Our 28 original shapes would look as follows:</p>
 <div class="cell" data-fold="true">
 <details class="code-fold">
 <summary>Code</summary>
@@ -2652,7 +2670,7 @@ window.Quarto = {
 <span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="do">## Extract outlines</span></span>
 <span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>dir <span class="ot">&lt;-</span> <span class="fu">getwd</span>()</span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="fu">setwd</span>(<span class="st">&quot;Parametric_space_outlines&quot;</span>) <span class="do">## Set your own path where the jpgs are</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="fu">setwd</span>(<span class="st">&quot;../inst/extdata/Parametric_space_outlines&quot;</span>) <span class="do">## Set your own path where the jpgs are</span></span>
 <span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="do">## Parametric_space_outlines is a folder with the oulines.jpgs of the shapes, and it is provided as data within the Simumorph package. It can also be found, individually, at github/acortell3/Simumorph. If the user has downloaded with the package. It can know the path where the files are by running system.file(&quot;extdata/Parametric_space_outlines&quot;, package = Simumorph&quot;). Then the folder can be moved somewhere else, or the path can be directly substituted here.</span></span>
 <span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
 <span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>geo_list <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">28</span>)</span>
@@ -2702,14 +2720,14 @@ window.Quarto = {
 </details>
 </div>
 </section>
-<section id="shape-variation" class="level2">
-<h2 class="anchored" data-anchor-id="shape-variation">Shape variation</h2>
-<p>This section explains how we produce the shape variation given the morphospace described above. In order to simulate shape from non-independent parameters, we will use a truncated multivariate normal distribution (see <a href="#sec-mod" class="quarto-xref">Section 4</a>). Sampling from a multivariate normal distribution relies on a covariance matrix which, in our case, is obtained from the parameters extracted from the morphospace. In the following subsections, we explain (1) potential issues and solutions of the use of covariance matrices given typical parametric values in GMM, (2) further reasoning on our parameter choice and (3) some restrictions that are necessary to produce plausible shapes.</p>
-<section id="sec-covmat" class="level3">
-<h3 class="anchored" data-anchor-id="sec-covmat">Covariance matrix</h3>
+<section id="shape-variation" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="shape-variation"><span class="header-section-number">3.2</span> Shape variation</h2>
+<p>This section explains how we produce the shape variation given the morphospace described above. In order to simulate shapes from non-independent parameters, we will use a truncated multivariate normal distribution (see <a href="#sec-mod" class="quarto-xref">Section 4</a>). Sampling from a multivariate normal distribution relies on a covariance matrix which, in our case, is obtained from the parameters extracted from the morphospace. In the following subsections, we explain (1) potential issues and solutions of the use of covariance matrices given typical parametric values in GMM, (2) further reasoning on our parameter choice and (3) some restrictions that are necessary to produce plausible shapes.</p>
+<section id="sec-covmat" class="level3" data-number="3.2.1">
+<h3 data-number="3.2.1" class="anchored" data-anchor-id="sec-covmat"><span class="header-section-number">3.2.1</span> Covariance matrix</h3>
 <p>In order to sample from a multivariate normal distribution, we need to perform a Cholesky decomposition on the covariance matrix. This requires the matrix to be positive definite which, in turn, sets the requirements that this matrix is (1) large enough in relation with the number of covariates and (2) with low degree of collinearity. Likewise, in the associated paper we have also seen how some authors have used covariance matrices directly on the results of PCA analyses (e.g. <span class="citation" data-cites="polly_simulation_2004">Polly (<a href="#ref-polly_simulation_2004" role="doc-biblioref">2004</a>)</span>) and how this might not the best approach for our specific data, due to the <em>mosquito wing</em> problem.</p>
-<section id="sample-size" class="level4">
-<h4 class="anchored" data-anchor-id="sample-size">Sample size</h4>
+<section id="sample-size" class="level4" data-number="3.2.1.1">
+<h4 data-number="3.2.1.1" class="anchored" data-anchor-id="sample-size"><span class="header-section-number">3.2.1.1</span> Sample size</h4>
 <p>We can address the problem of sample size through parametric linear interpolation. See, for instance, how it is used to produce the following shape sequence from shape A to shape B.</p>
 <div class="cell" data-fold="true">
 <details class="code-fold">
@@ -2799,12 +2817,12 @@ window.Quarto = {
 <span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>par_vals <span class="ot">&lt;-</span> <span class="fu">sapply</span>(expanded_ms,<span class="cf">function</span>(x) <span class="fu">unlist</span>(x))[<span class="fu">c</span>(<span class="dv">0</span><span class="sc">:</span><span class="fu">length</span>(types)),]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<p>A caveat to have in mind is that mean shapes can be affected by (1) how the initial <span class="math inline">\((x,y)\)</span> coordinates are extracted and (2) how the General Procrustes Analysis is performed. In the first case this is because the function <code>import_jpg</code> from <code>Momocs</code> runs an internal randomisation, which can result in slightly different coordinates which, in turn, might return slightly different parameters. In the second case, this is because a GPA includes changes in scale, which means that the exact parameters of a specific shape are relative to the broader morphospace which it is centred into. As discussed in the main paper, there are some solutions to this. For the paper, and because we have enough shapes, we have decided to simply visually explore the extended morphospace and discard the unplausible shapes, in order to build the covariance matrix.</p>
+<p>A caveat to have in mind is that a mean interpolated shape between any two existing shapes will not necessarily result on an existing, or even plausible shape itserlf. Therefore, and as discussed in the main paper, we visually explore the extended morphospace and discard the unplausible shapes, in order to build the covariance matrix.</p>
 </section>
-<section id="collinearity" class="level4">
-<h4 class="anchored" data-anchor-id="collinearity">Collinearity</h4>
-<p>The procedure in the section above is just a straightforward proposal to increase our sample size. There are more sophisticated approaches but, in any case, because our new shapes will depend on linear interpolation, the collinearity of the parameters within our sample is not reduced. To solve this, we can switch to model with the mathematical properties of the wave <span class="math inline">\(A_n\)</span> and <span class="math inline">\(\phi_n\)</span> instead of the Fourier parameters <span class="math inline">\(a_n\)</span>, <span class="math inline">\(b_n\)</span>, <span class="math inline">\(c_n\)</span> and <span class="math inline">\(d_n\)</span> using the equations explained in <a href="#sec-amp" class="quarto-xref">Section 2.1.1.2</a> and <a href="#sec-pha" class="quarto-xref">Section 2.1.1.3</a>. This solves the collinearity problem because the computation of <span class="math inline">\(\phi\)</span> is based on periodic functions, which are not linear.</p>
-<p>We can convert our estimated parameters <span class="math inline">\(a_n\)</span>, <span class="math inline">\(b_n\)</span>, <span class="math inline">\(c_n\)</span> and <span class="math inline">\(d_n\)</span> into <span class="math inline">\(A_n\)</span> and <span class="math inline">\(\phi_n\)</span> with the code below.</p>
+<section id="collinearity" class="level4" data-number="3.2.1.2">
+<h4 data-number="3.2.1.2" class="anchored" data-anchor-id="collinearity"><span class="header-section-number">3.2.1.2</span> Collinearity</h4>
+<p>The procedure in the section above is just a straightforward proposal to increase our sample size. There are more sophisticated approaches but, in any case, because our new shapes will depend on linear interpolation, the collinearity of the parameters within our sample is not reduced. To solve this, we can switch to model with the mathematical properties of the wave <span class="math inline">\(A_j\)</span> and <span class="math inline">\(\phi_j\)</span> instead of the Fourier parameters using the equations explained in <a href="#sec-amp" class="quarto-xref">Section 2.1.1.2</a> and <a href="#sec-pha" class="quarto-xref">Section 2.1.1.3</a>. This solves the collinearity problem because the computation of <span class="math inline">\(\phi\)</span> is based on periodic functions, which are not linear.</p>
+<p>We can convert our estimated parameters <span class="math inline">\(a_j\)</span>, <span class="math inline">\(b_j\)</span>, <span class="math inline">\(c_j\)</span> and <span class="math inline">\(d_j\)</span> into <span class="math inline">\(A_j\)</span> and <span class="math inline">\(\phi_j\)</span> with the code below.</p>
 <div class="cell" data-fold="true">
 <details class="code-fold">
 <summary>Code</summary>
@@ -2842,7 +2860,7 @@ window.Quarto = {
 <span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<p>After this, we can produce a covariance matrix for each of our matrices (one using the Fourier parameters and another one produced with <span class="math inline">\(A_n\)</span> and <span class="math inline">\(\phi_n\)</span>), and do some exploratory checks on their collinearity. For example, we can see how many of the pairwise correlations of our covariates are above certain threshold (e.g. 80% or 95%), or we can compute a value for mean collinearity as the mean of the pairwise collinearities.</p>
+<p>After this, we can produce a covariance matrix for each of our matrices (one using the Fourier parameters and another one produced with <span class="math inline">\(A_j\)</span> and <span class="math inline">\(\phi_j\)</span>), and do some exploratory checks on their collinearity. For example, we can see how many of the pairwise correlations of our covariates are above certain threshold (e.g. 80% or 95%), or we can compute a value for mean collinearity as the mean of the pairwise collinearities.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -2920,7 +2938,7 @@ window.Quarto = {
 </table>
 </div>
 </div>
-<p>Finally, we can check how the matrix produced through the Fourier parameters <span class="math inline">\(a_n\)</span>, <span class="math inline">\(b_n\)</span>, <span class="math inline">\(c_n\)</span> and <span class="math inline">\(d_n\)</span> is not positive definite, whilst the one produced with amplitudes and phases is positive definite.</p>
+<p>Finally, we can check how the matrix produced through the Fourier parameters is not positive definite, whilst the one produced with amplitudes and phases is positive definite.</p>
 <div class="cell" data-fold="true">
 <details class="code-fold">
 <summary>Code</summary>
@@ -2939,22 +2957,22 @@ window.Quarto = {
 </div>
 </section>
 </section>
-<section id="sec-pars" class="level3">
-<h3 class="anchored" data-anchor-id="sec-pars">Parameters</h3>
-<p>The section above is the main reason why we will produce our simulation relying on the mathematicla properties of the harmonics (<span class="math inline">\(A_n\)</span> and <span class="math inline">\(\phi_n\)</span>), rather than the Fourier parameters (<span class="math inline">\(a_n\)</span>, <span class="math inline">\(b_n\)</span>, <span class="math inline">\(c_n\)</span>, <span class="math inline">\(d_n\)</span>), but it is not the only one. Amplitude and phase (and frequency) are the actual variables that control a harmonic, independently of the methods used to define or analyse it (e.g. Fourier decomposition). In contexts like ours, with high parametric variance, the complex interplay between the different Fourier parameters eventually produces unplausible jumps and shapes during the simulation drift. Even having a covariance matrix, if the variance is high in high dimensional spaces, small changes in our correlation structure might result in dramatic impacts on the shape produced, because working directly with parameters does not necessarily respect the amplitude and phase structure which ultimately produce the final shape. Even if they are forced to be dependent, small changes in the parameter values during the drift, where the values at <span class="math inline">\(t\)</span> depend on the values at <span class="math inline">\(t-1\)</span>, might result in (1) not respecting the parameter hierarchies (e.g. higher order harmonics might have wider ranges than lower order harmonics) and (2) drift to extreme values for one or more parameters. Because working directly with the Fourier parameters does not necessarily establish an explicit link with the amplitude and phase of the harmonics, all of this might result in changes of phase or unstructured amplitudes which, in the last instance, end up producing unrealistically abrupt shape changes or, worst, unplausible shapes. In short, working ‘<em>blindly</em>’ with the Fourier parameters does not necessarily assure that our amplitude and phase relationships are respected which, during drifts, ends up producing unrealistic shapes.</p>
-<p>Thus, working directly with phase and amplitude gives a higher control of the harmonic shape. Admittedly, this poses some mathematical issues, such as the fact that we are working with periodic functions, which challenges the assumption of normal distribution for our parameters. But these can be dealt with, as we will see below. On top of this, because Fourier parameters can easily be computed back from the resulting shapes, we can resort back to those on the simulated shapes in case we needed tests of common use within the GMM approach which assume normality (e.g. manova).</p>
+<section id="sec-pars" class="level3" data-number="3.2.2">
+<h3 data-number="3.2.2" class="anchored" data-anchor-id="sec-pars"><span class="header-section-number">3.2.2</span> Parameters</h3>
+<p>The section above is one of the main reasons why we will produce our simulation relying on the mathematical properties of the harmonics (<span class="math inline">\(A_j\)</span> and <span class="math inline">\(\phi_j\)</span>), rather than the Fourier parameters, but it is not the only one. Amplitude and phase (and frequency) are the actual variables that control a harmonic, independently of the methods used to define or analyse it (e.g. Fourier decomposition). In contexts like ours, with high parametric variance, the complex interplay between the different Fourier parameters eventually produces unplausible jumps and shapes during the simulation drift. Even having a covariance matrix, if the variance is high in highly dimensional spaces, small changes in our correlation structure might result in dramatic impacts on the shape produced, because working directly with parameters does not necessarily respect the amplitude and phase structure which ultimately produce the final shape. Even if they are forced to be dependent, small changes in the parameter values during the drift, where the values at <span class="math inline">\(t\)</span> depend on the values at <span class="math inline">\(t-1\)</span>, might result in (1) not respecting the parameter hierarchies (e.g. higher order harmonics might have wider ranges than lower order harmonics) and (2) drift to extreme values for one or more parameters. Because working directly with the Fourier parameters does not necessarily establish an explicit link with the amplitude and phase of the harmonics, all of this might result in changes of phase or unstructured amplitudes which, in the last instance, end up producing unrealistically abrupt shape changes or, worst, unplausible shapes. In short, working ‘<em>blindly</em>’ with the Fourier parameters does not necessarily ensure that our amplitude and phase relationships are respected which, during drifts, ends up producing unrealistic shapes.</p>
+<p>Thus, working directly with phase and amplitude gives a higher control of the harmonic shape. In any case, because Fourier parameters can easily be computed back from the resulting shapes, we can resort back to those on the simulated shapes in case we needed tests of common use within the GMM approach.</p>
 </section>
-<section id="sec-rest" class="level3">
-<h3 class="anchored" data-anchor-id="sec-rest">Restrictions</h3>
+<section id="sec-rest" class="level3" data-number="3.2.3">
+<h3 data-number="3.2.3" class="anchored" data-anchor-id="sec-rest"><span class="header-section-number">3.2.3</span> Restrictions</h3>
 <p>In order to assure a realistic and smooth simulation, we have established two restrictions as follows:</p>
-<section id="truncation-on-multivariate-normal" class="level4">
-<h4 class="anchored" data-anchor-id="truncation-on-multivariate-normal">Truncation on multivariate normal</h4>
-<p>One of the most important concepts is that of the harmonic hierarchy where <span class="math inline">\(A_n &gt; A_{n+1}\)</span>. While this is broadly addressed by the use of a covariance matrix, as we have seen above the parametric values can go to unrealistic ranges during drift. This also affects the phase values, with range <span class="math inline">\(\phi_n[-\pi,\pi]\)</span>. In order to solve this, instead of sampling from a multivariate normal distribution, we use a truncated multivariate normal distribution, where we establish range boundaries for <span class="math inline">\(A_n\)</span> and <span class="math inline">\(\phi_n\)</span>.</p>
-<section id="amplitude" class="level5">
-<h5 class="anchored" data-anchor-id="amplitude">Amplitude</h5>
-<p>The upper and lower thresholds for <span class="math inline">\(A_n\)</span> are defined by the ones observed in the parametric space. Let <span class="math inline">\(\mathbf{A}\)</span> be the section of the covariance matrix with the amplitude values from the shapes within our morphospace, with dimensions <span class="math inline">\(I \times J\)</span>, where <span class="math inline">\(A_{ij}\)</span> is the <span class="math inline">\(i\)</span>-th shape and the <span class="math inline">\(j\)</span>-th harmonic. If <span class="math inline">\(\vec{A}_\max\)</span> is the vector with the upper boundary for our truncated multivariate normal and <span class="math inline">\(\vec{A}_\min\)</span> is the vector for the lower boundary, then:</p>
-<p><span class="math display">\[\left[\vec{A}_{\max}\right]_j = \max_{1 \leq i \leq I} A_{ij}, \qquad
-\left[\vec{A}_{\min}\right]_j = \min_{1 \leq i \leq I} A_{ij}.\]</span></p>
+<section id="truncation-on-multivariate-normal" class="level4" data-number="3.2.3.1">
+<h4 data-number="3.2.3.1" class="anchored" data-anchor-id="truncation-on-multivariate-normal"><span class="header-section-number">3.2.3.1</span> Truncation on multivariate normal</h4>
+<p>One of the most important concepts is that of the harmonic hierarchy where <span class="math inline">\(A_j &gt; A_{j+1}\)</span>. While this is broadly addressed by the use of a covariance matrix, as we have seen above the parametric values can go to unrealistic ranges during drift. This also affects the phase values, with range <span class="math inline">\(\phi_j[-\pi,\pi]\)</span>. In order to solve this, instead of sampling from a multivariate normal distribution, we use a truncated multivariate normal distribution, where we establish range boundaries for <span class="math inline">\(A_j\)</span> and <span class="math inline">\(\phi_j\)</span>.</p>
+<section id="amplitude" class="level5" data-number="3.2.3.1.1">
+<h5 data-number="3.2.3.1.1" class="anchored" data-anchor-id="amplitude"><span class="header-section-number">3.2.3.1.1</span> Amplitude</h5>
+<p>The upper and lower thresholds for <span class="math inline">\(A_j\)</span> (we consider <span class="math inline">\(x,y\)</span> jointly) are defined by the ones observed in the parametric space. Let <span class="math inline">\(\mathbf{A}\)</span> be the section of the covariance matrix with the amplitude values from the shapes within our morphospace, with dimensions <span class="math inline">\(I \times J\)</span>, where <span class="math inline">\(A_{ij}\)</span> is the <span class="math inline">\(i\)</span>-th shape and the <span class="math inline">\(j\)</span>-th harmonic. If <span class="math inline">\(A_\max\)</span> is the vector with the upper boundary for our truncated multivariate normal and <span class="math inline">\(A_\min\)</span> is the vector for the lower boundary, then:</p>
+<p><span class="math display">\[\left[A_{\max}\right]_j = \max_{1 \leq i \leq I} A_{ij}, \qquad
+\left[A_{\min}\right]_j = \min_{1 \leq i \leq I} A_{ij}.\]</span></p>
 <p>This can be easily put into code as:</p>
 <div class="cell" data-fold="true">
 <details class="code-fold">
@@ -2966,10 +2984,10 @@ window.Quarto = {
 </details>
 </div>
 </section>
-<section id="phase" class="level5">
-<h5 class="anchored" data-anchor-id="phase">Phase</h5>
-<p>As for <span class="math inline">\(\phi_n\)</span>, this is a bit trickier. As above, we can consider <span class="math inline">\(\mathbf{P}\)</span> the section of the covariance matrix with the phase values from the shapes of our morphospace, with dimensions <span class="math inline">\(I \times J\)</span>, with <span class="math inline">\(\vec{\phi}_\max\)</span> being the vector for the upper boundary and <span class="math inline">\(\vec{\phi}_\min\)</span> the one for the lower boundary. Because phase is a circular variable, then its upper and lower thresholds are globably restricted by</p>
-<p><span class="math display">\[\vec{\phi}_\max = \pi, \qquad \vec{\phi}_\min = -\pi.\]</span></p>
+<section id="phase" class="level5" data-number="3.2.3.1.2">
+<h5 data-number="3.2.3.1.2" class="anchored" data-anchor-id="phase"><span class="header-section-number">3.2.3.1.2</span> Phase</h5>
+<p>As for <span class="math inline">\(\phi_j\)</span>, this is a bit trickier. As above, we can consider <span class="math inline">\(\mathbf{P}\)</span> the section of the covariance matrix with the phase values from the shapes of our morphospace, with dimensions <span class="math inline">\(I \times J\)</span>, with <span class="math inline">\(\phi_\max\)</span> being the vector for the upper boundary and <span class="math inline">\(\phi_\min\)</span> the one for the lower boundary. Because phase is a circular variable, then its upper and lower thresholds are globably restricted by</p>
+<p><span class="math display">\[\phi_\max = \pi, \qquad \phi_\min = -\pi.\]</span></p>
 <p>But modelling the phase presents an additional challenge because certain extreme combinations of phase values such as, for example, <span class="math inline">\(\mathrm{sin}(\phi_{x1}) \approx \mathrm{sin}(\phi_{yn})\)</span> combined with <span class="math inline">\(\mathrm{cos}(\phi_{x1}) \not\approx \mathrm{cos}(\phi_{yn})\)</span>, can give place to wiggly forms. To account for this, we have decided to include a local restriction, which solves this problem by smoothing the simulation overall and, combined with the target-based approach (<a href="#sec-targ" class="quarto-xref">Section 3.3</a>), avoids sudden changes of phase. To do this, we include a threshold value <span class="math inline">\(\alpha\)</span>, such that</p>
 <p><span class="math display">\[\phi_{t-1} - \alpha &lt; \phi_t &lt; \phi_{t-1} + \alpha.\]</span></p>
 <div class="cell" data-fold="true">
@@ -2988,44 +3006,47 @@ window.Quarto = {
 </div>
 </section>
 </section>
-<section id="restriction-on-crossing-lines" class="level4">
-<h4 class="anchored" data-anchor-id="restriction-on-crossing-lines">Restriction on crossing lines</h4>
+<section id="restriction-on-crossing-lines" class="level4" data-number="3.2.3.2">
+<h4 data-number="3.2.3.2" class="anchored" data-anchor-id="restriction-on-crossing-lines"><span class="header-section-number">3.2.3.2</span> Restriction on crossing lines</h4>
 <p>The restrictions above impede sudden shape changes and unrealistic shapes (e.g. laces), but although they strongly reduce them, they do not completely avoid line intersections, which might still occasionally occurr in the extremes of the shapes. We avoid this algorithmically, by treating the shapes as spatial objects (just sets of <span class="math inline">\((x,y)\)</span> coordinates) and applying the R function <code>st_is_valid</code>, from the R package <code>sf</code> <span class="citation" data-cites="pebesma_spatial_2023">(<a href="#ref-pebesma_spatial_2023" role="doc-biblioref">Pebesma &amp; Bivand, 2023</a>)</span>, which checks the topological validity of a given geometry. If the function returns an invalid geometry (e.g. line-intersection), the simulation candidate for <span class="math inline">\(t\)</span> is not accepted and it is resampled from <span class="math inline">\(t-1\)</span>.</p>
 </section>
 </section>
 </section>
-<section id="sec-targ" class="level2">
-<h2 class="anchored" data-anchor-id="sec-targ">Targets</h2>
-<p>This is the final tool that we use to complete the simulation, and it is in combination with all of the above. The rationale is simple, because at this stage it is not possible to reliably predict the parameter values that would produce specific shapes, a <em>safety check</em> is produced every time a new shape is produced. For this check, we compute the Procrustes distance between the shape and a given target and accept it only if it is below a specific threshold <span class="math inline">\(\epsilon\)</span>.</p>
-<p>This approach offers substantial versatility, since it can be implemented in very different ways. For instance, we might want to simulate the transition from a given shape A to a shape B, where phase B would be our target. We might also use in a way so that all our simulations remain relatively close to a specific given shape (which is what what we will do in the last section of this tutorial), or we can implement several target shapes to allow shifting among potential types without loosing morphometric plausability. Finally, if we want to give significant amounts of freedom to the evolutionary drift to explore on the emergence of previously unseen shapes, we can give a large value for <span class="math inline">\(\epsilon\)</span>, which would effectively reduce the importance of the targets to a minimum and give more freedom to the simulation. All these different options have been included in the provided R package.</p>
+<section id="sec-targ" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="sec-targ"><span class="header-section-number">3.3</span> Targets</h2>
+<p>This is the final tool that we use to complete the simulation, and it is in combination with all of the above. Basically, each time a new shape is produced we compute the Procrustes distance between the shape and a given target and accept it only if it is below a specific threshold <span class="math inline">\(\epsilon\)</span>.</p>
+<p>This approach offers substantial versatility, since it can be implemented in very different ways. For instance, we might want to simulate the transition from a given shape A to a shape B, where phase B would be our target. We might also use in a way so that all our simulations remain relatively close to a specific given shape, or we can implement several target shapes to allow shifting among potential types without loosing morphometric plausability. Finally, if we want to give significant amounts of freedom to the evolutionary drift to explore on the emergence of previously unseen shapes, we can give a large value for <span class="math inline">\(\epsilon\)</span>, which would effectively reduce the importance of the targets to a minimum and give more freedom to the simulation. All these different implementation methods are shown in the main manuscript, and additional supplementary material, and have been included in the provided R package.</p>
 </section>
 </section>
-<section id="sec-mod" class="level1">
-<h1>Model and simulation</h1>
-<p>By now we know that we have an amplitude and phase value per coordinate and harmonic. Thus, from our morphometric space, we obtain the following matrix</p>
+<section id="sec-mod" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Model and simulation</h1>
+<p>By now we know that we have an amplitude and phase value per coordinate and harmonic. Thus, from our morphometric space, we obtain the covariance matrix <span class="math inline">\(\Sigma = 1/(N-1)M^TM\)</span> with</p>
 <p><span class="math display">\[
 \mathbf{M} = \begin{pmatrix}
-\vec{V}_1 \\
-\vec{V}_2 \\
+V_1 \\
+V_2 \\
 \vdots \\
-\vec{V}_N
+V_N
 \end{pmatrix} =
-\begin{pmatrix}
-A_{1x1} &amp; \cdots &amp; A_{1x7} &amp; A_{1y1} &amp; \cdots &amp; A_{1y7} &amp; \phi_{1x1} &amp; \cdots &amp; \phi_{1x7} &amp; \phi_{1y1} &amp; \cdots &amp; \phi_{1y7} \\
-A_{2x1} &amp; \cdots &amp; A_{2x7} &amp; A_{2y1} &amp; \cdots &amp; A_{2y7} &amp; \phi_{2x1} &amp; \cdots &amp; \phi_{2x7} &amp; \phi_{2y1} &amp; \cdots &amp; \phi_{2y7} \\
+\left(
+\begin{array}{cccccccccccc}
+A_{1}^{x1} &amp; \cdots &amp; A_{1}^{xn} &amp; A_{1}^{y1} &amp; \cdots &amp; A_{1}^{yn} &amp; \phi_{1}^{x1} &amp; \cdots &amp; \phi_{1}^{xn} &amp; \phi_{1}^{y1} &amp; \cdots &amp; \phi_{1}^{yn} \\
+A_{2}^{x1} &amp; \cdots &amp; A_{2}^{xn} &amp; A_{2}^{y1} &amp; \cdots &amp; A_{2}^{yn} &amp; \phi_{2}^{x1} &amp; \cdots &amp; \phi_{2}^{xn} &amp; \phi_{2}^{y1} &amp; \cdots &amp; \phi_{2}^{yn} \\
 \vdots &amp; \ddots &amp; \vdots &amp; \vdots &amp; \ddots &amp; \vdots &amp; \vdots &amp; \ddots &amp; \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
-A_{Nx1} &amp; \cdots &amp; A_{Nx7} &amp; A_{Ny1} &amp; \cdots &amp; A_{Ny7} &amp; \phi_{Nx1} &amp; \cdots &amp; \phi_{Nx7} &amp; \phi_{Ny1} &amp; \cdots &amp; \phi_{Ny7}
-\end{pmatrix},
+A_{N}^{x1} &amp; \cdots &amp; A_{N}^{xn} &amp; A_{N}^{y1} &amp; \cdots &amp; A_{N}^{yn} &amp; \phi_{N}^{x1} &amp; \cdots &amp; \phi_{N}^{xn} &amp; \phi_{N}^{y1} &amp; \cdots &amp; \phi_{N}^{yn}
+\end{array}
+\right).
 \]</span></p>
-<p>which can be transformed into the positive definite covariance matrix <span class="math inline">\(\Sigma = MM^T\)</span>.</p>
 <p>From here, we can estimate each new shape as</p>
-<p><span class="math display">\[\tilde{\vec{V}}_t^\mathsf{T} \sim N_T(\mu,\Sigma),\]</span></p>
+<p><span class="math display">\[\tilde{V}(t) \sim \mathcal{N}_T(\mu,\Sigma),\]</span></p>
 <p>where</p>
-<p><span class="math display">\[\mu = \begin{cases}
-    \vec{V}_s &amp; \text{if } t = 1 \\
-    \vec{V}_{t-1} &amp; \text{if } t &gt; 1,
-\end{cases}\]</span></p>
-<p>and <span class="math inline">\(\vec{V}_s\)</span> represents one single shape within our morphospace, to be chosen by the modeller. Of course, as a starting point, the user can decide other options. Attending to all of the above, we reproduce stochastic variation from one initial shape through 20 time steps with the following code:</p>
+<p><span class="math display">\[
+\mu = \begin{cases}
+    V_s &amp; \text{if } t = 1 \\
+    V(t-1) &amp; \text{if } t &gt; 1,
+\end{cases},
+\]</span></p>
+<p>and <span class="math inline">\(V_s\)</span> represents the chosen initial shape at <span class="math inline">\(t=1\)</span>. Attending to all of the above, we reproduce stochastic variation from one initial shape through 20 time steps with the following code:</p>
 <p><span style="font-size: 11px;"><em>The code below will not run on a stand-alone, since it uses the objects and functions used in the previous chunks.</em></span></p>
 <div class="cell" data-fold="true">
 <details class="code-fold">
@@ -3120,9 +3141,9 @@ A_{Nx1} &amp; \cdots &amp; A_{Nx7} &amp; A_{Ny1} &amp; \cdots &amp; A_{Ny7} &amp
 </div>
 </div>
 </section>
-<section id="simumorph" class="level1">
-<h1>Simumorph</h1>
-<p>We have compiled all the above functions within the <code>Rpackage Simumorph</code>, so that the user does not have to code all of it itself. Here we show a basic workflow of how a quick simulation would work. Let’s start by installing and loading the package.</p>
+<section id="simumorph" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Simumorph</h1>
+<p>We have compiled all the above functions within the <code>Rpackage Simumorph</code>. Here we show a basic workflow of how a quick simulation would work. Let’s start by installing and loading the package.</p>
 <div class="cell" data-fold="true">
 <details class="code-fold">
 <summary>Code</summary>
@@ -3216,10 +3237,10 @@ A_{Nx1} &amp; \cdots &amp; A_{Nx7} &amp; A_{Ny1} &amp; \cdots &amp; A_{Ny7} &amp
 </div>
 <p>Currently, the main simulation can support four basic methods, as follows:</p>
 <ol type="1">
-<li><code>&quot;AtoA&quot;</code>. An initial shape “A” is provided and the simulation stays broadly close to it, depending on the level <span class="math inline">\(\epsilon\)</span></li>
+<li><code>&quot;AtoA&quot;</code>. An initial shape “A” is provided and the simulation stays broadly close to it, depending on the level <span class="math inline">\(\epsilon\)</span>.</li>
 <li><code>&quot;AtoB&quot;</code>. An initial shape “A” and a target shape “B” are provided. The simulation slowly moves towards “B”.</li>
-<li><code>&quot;AtoMult&quot;</code>. An initial shape “A”, along with tow or more target shapes (it can be the full morphospace) are provided. The simulation can move freely as long as it stays at <span class="math inline">\(\epsilon\)</span> distance from any or the provided shapes.</li>
-<li><code>&quot;Free&quot;</code>. An initial shape “A” is provided, but not targets. The simulation moves freely, and it can drift towards shapes that have not not been observed within the archaeological record. If in the case 1 (“AtoA”), the value of <span class="math inline">\(\epsilon\)</span> is high, its results might approach this one.</li>
+<li><code>&quot;AtoMult&quot;</code>. An initial shape “A”, along with two or more target shapes (it can be the full morphospace) are provided. The simulation can move freely as long as it stays at <span class="math inline">\(\epsilon\)</span> distance from any or the provided shapes.</li>
+<li><code>&quot;Free&quot;</code>. An initial shape “A” is provided, but not targets. The simulation moves freely, and it can drift towards shapes that have not been observed within the archaeological record. If in the case 1 (“AtoA”), the value of <span class="math inline">\(\epsilon\)</span> is high, its results might approach this one.</li>
 </ol>
 <p>We will focus on the case <code>&quot;AtoB&quot;</code>. The user could (and should) try with different modes. Let’s first make sure that our initial and target shapes are indeed the ones that we want through visual inspection. We can select them, and build single shapes from their <span class="math inline">\(A_n\)</span> and <span class="math inline">\(\phi_n\)</span> values using the function <code>build_s</code>. In the arguments below, essentially we load the shapes from the morphospace, specifying that it is one single shape (<code>sing.vals = F</code>), given a number of <span class="math inline">\(x,y\)</span> coordinate-points <code>np</code> and specifying that we do not want to extract the Fourier parameters as well (<code>fou.pars = F</code>), since we do not need them for the remainder of the simulation.</p>
 <div class="cell" data-fold="true">
@@ -3256,7 +3277,7 @@ A_{Nx1} &amp; \cdots &amp; A_{Nx7} &amp; A_{Ny1} &amp; \cdots &amp; A_{Ny7} &amp
           0.2273362 </code></pre>
 </div>
 </div>
-<p>With all of the above, we can finally perform the simulation. Let’s consider a simulation where we will go from shape A to shape B, allowing an initial distance of <span class="math inline">\(\epsilon = 0.25\)</span>, based on the distance computed above. In this case, we will only produce the shapes (<code>only.shapes = T</code>) and we will allow the simulation to run for 100 times (<code>sim = 100</code>). While running the function, the step of the simulation is printed for guidance to the user. We only show 20 shapes, from the full 100 due to space reasons. While the simulation works,it prints the number of the simulation for guidance. The parameter <code>max.attempts</code> is there because, if <span class="math inline">\(\epsilon\)</span> is too low, the simulation might get stuck. This parameter stops the function if the number of attempts without distances lower to <span class="math inline">\(\epsilon\)</span> reaches the value in <code>max.attempts</code> (default is 500). An error message is generated, advising to increase <span class="math inline">\(\epsilon\)</span>. The case of the method “AtoB” is special. This is because <span class="math inline">\(\epsilon\)</span> works differently here. Here, a simulation at step <span class="math inline">\(t\)</span> is accepted if the distance from that simulation to the target is lower than the distance at <span class="math inline">\(t-1\)</span>. By definition, and for a long sequence, this can get the chain stuck. In this case, and after the number of attempts in <code>max.attempts</code> is reached, <span class="math inline">\(\epsilon\)</span> is increased and a warning is generated informing on where at which <span class="math inline">\(t\)</span> has <span class="math inline">\(\epsilon\)</span> been increased.</p>
+<p>With all of the above, we can finally perform the simulation. Let’s consider a simulation where we will go from shape A to shape B, allowing an initial distance of <span class="math inline">\(\epsilon = 0.25\)</span>, based on the distance computed above. In this case, we will only produce the shapes (<code>only.shapes = T</code>) and we will allow the simulation to run for 100 times (<code>sim = 100</code>). While running the function, the step of the simulation is printed for guidance to the user. We only show 20 shapes, from the full 100 due to space reasons. The parameter <code>max.attempts</code> is there because, if <span class="math inline">\(\epsilon\)</span> is too low, the simulation might get stuck. Usually, this parameter stops the function if the number of attempts without distances lower to <span class="math inline">\(\epsilon\)</span> reaches the value in <code>max.attempts</code> (default is 500), and an error message is generated, advising to increase <span class="math inline">\(\epsilon\)</span>. The case of the method “AtoB” is special. This is because <span class="math inline">\(\epsilon\)</span> works differently here. Here, a simulation at step <span class="math inline">\(t\)</span> is accepted if the distance from that simulation to the target is lower than the distance at <span class="math inline">\(t-1\)</span>. By definition, and for a long sequence, this can get the chain stuck. In this case, and after the number of attempts in <code>max.attempts</code> is reached, <span class="math inline">\(\epsilon\)</span> is increased and a warning is issued informing on where at which <span class="math inline">\(t\)</span> has <span class="math inline">\(\epsilon\)</span> been increased. Finally, the parameter <code>speedAtoB</code> (not shown below) acts only on this <code>AtoB</code> scenario, and allows for an artificial increase (or decrease) of <span class="math inline">\(\epsilon\)</span> at each <span class="math inline">\(t\)</span>, allowing a greater control over the timing of the simulation.</p>
 <div class="cell" data-fold="true">
 <details class="code-fold">
 <summary>Code</summary>
@@ -3386,13 +3407,13 @@ A_{Nx1} &amp; \cdots &amp; A_{Nx7} &amp; A_{Ny1} &amp; \cdots &amp; A_{Ny7} &amp
 </div>
 </div>
 <p>From here, the user can start playing with the different options of the package (also look into help() for function specs). More vignettes and functions (hopefully) coming soon!</p>
-<section id="references" class="level2 unnumbered">
+</section>
+<section id="references" class="level1 unnumbered" data-number="6">
 
 
 </section>
-</section>
 
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2" role="list">
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">6 References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2" role="list">
 <div id="ref-bonhomme_momocs:_2014" class="csl-entry" role="listitem">
 Bonhomme, V., Picq, S., Gaucherel, C., &amp; Claude, J. (2014). Momocs: <span>Outline</span> <span>Analysis</span> <span>Using</span> <span>R</span>. <em>Journal of Statistical Software</em>, <em>56</em>(13), 1–24.
 </div>
