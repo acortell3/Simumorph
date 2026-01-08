@@ -1,30 +1,27 @@
 
 ---
 title: "Fundamentals and workflow for the R package Simumorph"
-author:
-  - name: Alfredo Cortell-Nicolau
-    affiliations:
-      - name: Department of Human Behavior, Ecology and Culture. Max Planck Institute for Evolutionary Anthropology, Leipzig, Germany
-  - name: Anne Kandler
-    affiliations:
-      - ref: dhbec
-affiliations:
-  - id: dhbec
-    name: Department of Human Behavior, Ecology and Culture. Max Planck Institute for Evolutionary Anthropology, Leipzig, Germany
+
+subtitle: |
+  **Alfredo Cortell-Nicolau^1^, Anne Kandler^1^**
+
+  ^1^ *Department of Human Behavior, Ecology and Culture, Max Planck Institute for Evolutionary Anthropology, Leipzig, Germany*
+
 vignette: >
   %\VignetteIndexEntry{simumorph_vignette_1}
   %\VignetteEngine{quarto::html}
   %\VignetteEncoding{UTF-8}
+
 format:
   html:
     toc: true
     toc-location: body
-    code-fold: true
-    crossref: true
-    self-contained: true
     toc-depth: 3
     number-sections: true
+    code-fold: true
+    self-contained: true
     html-math-method: mathjax
+
 bibliography: references.bib
 csl: apa.csl
 editor: visual
